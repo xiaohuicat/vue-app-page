@@ -1,11 +1,12 @@
 {
   "name": "app-page",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "create your vue3 app easily",
   "main": "dist/app-page.js",
   "scripts": {
     "dev": "node main.js",
     "build": "node build.js",
+    "publish": "npm run build && npm publish",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
   },
@@ -14,12 +15,10 @@
     "url": "git+https://github.com/xiaohuicat/vue-app-page.git"
   },
   "keywords": [
-    "server",
-    "nodejs",
-    "framework",
-    "http",
-    "web",
-    "api"
+    "vue3",
+    "page",
+    "app",
+    "nanager"
   ],
   "author": "xiaohuicat",
   "license": "MIT",
