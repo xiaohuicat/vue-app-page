@@ -1,0 +1,41 @@
+{
+  "name": "app-page",
+  "version": "0.0.1",
+  "description": "create your vue3 app easily",
+  "main": "dist/app-page.js",
+  "scripts": {
+    "dev": "node main.js",
+    "build": "node build.js",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiaohuicat/vue-app-page.git"
+  },
+  "keywords": [
+    "server",
+    "nodejs",
+    "framework",
+    "http",
+    "web",
+    "api"
+  ],
+  "author": "xiaohuicat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xiaohuicat/vue-app-page/issues"
+  },
+  "homepage": "https://github.com/xiaohuicat/vue-app-page#readme",
+  "dependencies": {
+    "vue": "^3.4",
+    "vue-router": "^4.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.23.1",
+    "esbuild-node-externals": "^1.14.0",
+    "eslint": "^9.9.1",
+    "javascript-obfuscator": "^4.1.1",
+    "prettier": "^3.2.5"
+  }
+}
