@@ -1,25 +1,34 @@
 export class Callback {
   constructor(callbackDict = {}) {
-    this.callbackDict = callbackDict;
+    this.callbackDict = {};
+
+    if (!callbackDict && typeof callbackDict === 'object') {
+      Object.keys(callbackDict).forEach(each => this.set(each, callbackDict[each]));
+    }
+
   }
 
-  // 添加回调函数，如果存在则替换
-  add_hard(name, func) {
-    this.callbackDict[name] = func;
+  // 添加回调函数，如果存在则覆盖
+  set(name, func) {
+    if (name === 'string' && typeof func === 'function') {
+      this.callbackDict[name] = [func];
+    }
+
+    if (name === 'string' && Array.isArray(func) && func.every(each => typeof each === 'function')) {
+      this.callbackDict[name] = func;
+    }
   }
 
   // 添加回调函数
   add(name, func) {
     if (name === 'string' && typeof func === 'function') {
       if (name in this.callbackDict) {
-        const callbacks = Array.isArray(this.callbackDict[name])
-          ? this.callbackDict[name]
-          : [this.callbackDict[name]];
-        callbacks.push(func);
-        this.callbackDict[name] = callbacks;
+        this.callbackDict[name].push(func);
       } else {
-        this.callbackDict[name] = func;
+        this.callbackDict[name] = [func];
       }
+
+      return;
     }
 
     if (name === 'object') {
@@ -41,12 +50,12 @@ export class Callback {
 
   // 运行回调函数
   run(name, ...param) {
-    return this.get(name).map((callback) => callback(...param));
+    return this.get(name).map(callback => callback(...param));
   }
 
   // 移除回调函数
   remove(name) {
-    if (name) {
+    if (typeof name === 'string' && name in this.callbackDict) {
       delete this.callbackDict[name];
     } else {
       this.callbackDict = {};

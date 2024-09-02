@@ -14,19 +14,7 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.js
-var src_exports = {};
-__export(src_exports, {
-  Callback: () => Callback,
-  LocalStore: () => LocalStore,
-  Page: () => Page,
-  Tools: () => Tools_default,
-  default: () => src_default,
-  templateToComponment: () => templateToComponment
-});
-module.exports = __toCommonJS(src_exports);
+var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
 
 // src/Callback.js
 var Callback = class {
@@ -79,9 +67,6 @@ var Callback = class {
     this.callbackDict = {};
   }
 };
-
-// src/Page.js
-var import_vue_router = require("vue-router");
 
 // src/utils.js
 function isObject(obj) {
@@ -150,8 +135,29 @@ function downloadFileByUrl(url, filename) {
   }, 0);
 }
 
-// src/Page.js
-var import_vue = require("vue");
+// node_modules/.store/vue@3.4.38/node_modules/vue/dist/vue.runtime.esm-bundler.js
+var vue_runtime_esm_bundler_exports = {};
+__export(vue_runtime_esm_bundler_exports, {
+  compile: () => compile
+});
+__reExport(vue_runtime_esm_bundler_exports, runtime_dom_star);
+import { initCustomFormatter, warn } from "@vue/runtime-dom";
+import * as runtime_dom_star from "@vue/runtime-dom";
+function initDev() {
+  {
+    initCustomFormatter();
+  }
+}
+if (true) {
+  initDev();
+}
+var compile = () => {
+  if (true) {
+    warn(
+      `Runtime compilation is not supported in this build of Vue. Configure your bundler to alias "vue" to "vue/dist/vue.esm-bundler.js".`
+    );
+  }
+};
 
 // src/LocalStore.js
 var LocalStore = class {
@@ -270,15 +276,15 @@ var RangeTask = class {
 
 // src/Page.js
 var LIVE_MAP = {
-  onMounted: import_vue.onMounted,
-  onBeforeMount: import_vue.onBeforeMount,
-  onBeforeUpdate: import_vue.onBeforeUpdate,
-  onUpdated: import_vue.onUpdated,
-  onUnmounted: import_vue.onUnmounted,
-  onBeforeUnmount: import_vue.onBeforeUnmount,
-  onLoad: import_vue.onBeforeMount,
-  onReady: import_vue.onMounted,
-  onDestroy: import_vue.onUnmounted
+  onMounted: vue_runtime_esm_bundler_exports.onMounted,
+  onBeforeMount: vue_runtime_esm_bundler_exports.onBeforeMount,
+  onBeforeUpdate: vue_runtime_esm_bundler_exports.onBeforeUpdate,
+  onUpdated: vue_runtime_esm_bundler_exports.onUpdated,
+  onUnmounted: vue_runtime_esm_bundler_exports.onUnmounted,
+  onBeforeUnmount: vue_runtime_esm_bundler_exports.onBeforeUnmount,
+  onLoad: vue_runtime_esm_bundler_exports.onBeforeMount,
+  onReady: vue_runtime_esm_bundler_exports.onMounted,
+  onDestroy: vue_runtime_esm_bundler_exports.onUnmounted
 };
 function tryFunc(func, obj) {
   if (typeof func === "function") {
@@ -291,9 +297,9 @@ function tryFunc(func, obj) {
 }
 function createRef(val) {
   if (typeof val === "function") {
-    return (0, import_vue.computed)(val);
+    return (0, vue_runtime_esm_bundler_exports.computed)(val);
   } else {
-    return (0, import_vue.ref)(val);
+    return (0, vue_runtime_esm_bundler_exports.ref)(val);
   }
 }
 function createRefs(ctx, obj) {
@@ -310,7 +316,7 @@ function createFuns(ctx, obj) {
 }
 var Page = class {
   constructor(localStoreName) {
-    this.instance = (0, import_vue.getCurrentInstance)();
+    this.instance = (0, vue_runtime_esm_bundler_exports.getCurrentInstance)();
     const { props, emit, proxy } = this.instance;
     this.props = props;
     this.emit = emit;
@@ -322,16 +328,16 @@ var Page = class {
             key = key.replace("[getRef]", "");
             return target[key];
           }
-          return (0, import_vue.isRef)(target[key]) ? target[key].value : target[key];
+          return (0, vue_runtime_esm_bundler_exports.isRef)(target[key]) ? target[key].value : target[key];
         },
         set: (target, key, value) => {
           if (typeof key === "string" && key.indexOf("[setRef]") > -1) {
             key = key.replace("[setRef]", "");
-            target[key] = (0, import_vue.isRef)(value) ? value : createRef(value);
+            target[key] = (0, vue_runtime_esm_bundler_exports.isRef)(value) ? value : createRef(value);
             return true;
           }
           if (key in target) {
-            if ((0, import_vue.isRef)(target[key])) {
+            if ((0, vue_runtime_esm_bundler_exports.isRef)(target[key])) {
               target[key].value = value;
             } else {
               target[key] = value;
@@ -343,11 +349,10 @@ var Page = class {
         }
       }
     );
-    this.router = (0, import_vue_router.useRouter)();
     this.callback = new Callback();
     this.rangeTask = new RangeTask();
     this.local = new LocalStore(localStoreName ? localStoreName : "app-page-store");
-    (0, import_vue.onUnmounted)(() => this?.destroy());
+    (0, vue_runtime_esm_bundler_exports.onUnmounted)(() => this?.destroy());
   }
   // ref对象的配置、获取和设置
   setRefs(refs) {
@@ -390,7 +395,7 @@ var Page = class {
   }
   // watch数据对象
   watch(ref_or_fun, callback) {
-    (0, import_vue.watch)(ref_or_fun, (newValue, oldValue) => {
+    (0, vue_runtime_esm_bundler_exports.watch)(ref_or_fun, (newValue, oldValue) => {
       if (typeof callback === "function") {
         callback(newValue, oldValue);
       } else {
@@ -405,7 +410,7 @@ var Page = class {
       console.log(`refs\u4E2D\u6CA1\u6709\u8BE5${head}\uFF0C\u68C0\u67E5\u662F\u5426\u521D\u59CB\u5316\uFF01`);
       return;
     }
-    (0, import_vue.watch)(
+    (0, vue_runtime_esm_bundler_exports.watch)(
       () => {
         let ref_value = this.$[head];
         if (others.length) {
@@ -430,7 +435,7 @@ var Page = class {
       console.log(`props\u4E2D\u6CA1\u6709\u8BE5${name}\uFF0C\u68C0\u67E5\u662F\u5426\u521D\u59CB\u5316\uFF01`);
       return;
     }
-    (0, import_vue.watch)(
+    (0, vue_runtime_esm_bundler_exports.watch)(
       this.props[name].value ? this.props[name] : () => this.props[name],
       (newValue, oldValue) => {
         if (typeof callback === "function") {
@@ -477,7 +482,6 @@ var Page = class {
     this.emit = null;
     this.proxy = null;
     this.$ = null;
-    this.router = null;
     this.local.free();
     this.local = null;
     this.rangeTask.destroy();
@@ -542,7 +546,6 @@ var Tools_default = {
 };
 
 // src/templateParse.js
-var import_vue2 = require("vue");
 function isObject2(obj) {
   return obj !== null && typeof obj === "object" && !Array.isArray(obj);
 }
@@ -572,7 +575,7 @@ function templateToComponment({
     }
     const matchs = template2.match(/\{\{(.*?)\}\}/g);
     if (!matchs) {
-      vnode.push((0, import_vue2.h)("div", { class: mainClass }, template2.trim()));
+      vnode.push((0, vue_runtime_esm_bundler_exports.h)("div", { class: mainClass }, template2.trim()));
       return;
     }
     const children = [];
@@ -585,7 +588,7 @@ function templateToComponment({
       let component = componentMap?.[componentName];
       const { left, right } = cutString(parseTemplate, matchs[i2]);
       if (!component) {
-        children.push((0, import_vue2.h)("span", {}, left + componentName));
+        children.push((0, vue_runtime_esm_bundler_exports.h)("span", {}, left + componentName));
         parseTemplate = right;
         continue;
       }
@@ -607,13 +610,13 @@ function templateToComponment({
         }
       }
       if (left && left.trim()) {
-        children.push((0, import_vue2.h)("span", {}, left));
+        children.push((0, vue_runtime_esm_bundler_exports.h)("span", {}, left));
       }
       if (typeof component === "function") {
         component = component(props);
       }
       children.push(
-        (0, import_vue2.h)(component, {
+        (0, vue_runtime_esm_bundler_exports.h)(component, {
           ...componentProps,
           ...componentEvents,
           ...params
@@ -622,11 +625,11 @@ function templateToComponment({
       parseTemplate = right;
     }
     if (parseTemplate) {
-      children.push((0, import_vue2.h)("span", {}, parseTemplate));
+      children.push((0, vue_runtime_esm_bundler_exports.h)("span", {}, parseTemplate));
     }
-    vnode.push((0, import_vue2.h)("div", { class: mainClass }, children));
+    vnode.push((0, vue_runtime_esm_bundler_exports.h)("div", { class: mainClass }, children));
   });
-  return (0, import_vue2.defineComponent)({ render: () => vnode });
+  return (0, vue_runtime_esm_bundler_exports.defineComponent)({ render: () => vnode });
 }
 function getComponentByInstruction(instruction) {
   let componentName;
@@ -651,11 +654,20 @@ function getComponentByInstruction(instruction) {
 
 // src/index.js
 var src_default = Page;
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
+export {
   Callback,
   LocalStore,
   Page,
-  Tools,
+  Tools_default as Tools,
+  src_default as default,
   templateToComponment
-});
+};
+/*! Bundled license information:
+
+vue/dist/vue.runtime.esm-bundler.js:
+  (**
+  * vue v3.4.38
+  * (c) 2018-present Yuxi (Evan) You and Vue contributors
+  * @license MIT
+  **)
+*/

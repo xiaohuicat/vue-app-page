@@ -1,5 +1,4 @@
 import { Callback } from './Callback';
-import { useRouter } from 'vue-router';
 import { isObject, setObjectProperty } from './utils';
 import {
   onMounted,
@@ -102,7 +101,6 @@ export class Page {
       }
     );
 
-    this.router = useRouter();
     this.callback = new Callback();
     this.rangeTask = new RangeTask();
     this.local = new LocalStore(localStoreName ? localStoreName : 'app-page-store');
@@ -241,7 +239,6 @@ export class Page {
     this.emit = null;
     this.proxy = null;
     this.$ = null;
-    this.router = null;
     this.local.free();
     this.local = null;
     this.rangeTask.destroy();
