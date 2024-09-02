@@ -1,11 +1,9 @@
 export class Callback {
   constructor(callbackDict = {}) {
     this.callbackDict = {};
-
     if (!callbackDict && typeof callbackDict === 'object') {
       Object.keys(callbackDict).forEach(each => this.set(each, callbackDict[each]));
     }
-
   }
 
   // 添加回调函数，如果存在则覆盖
@@ -21,7 +19,7 @@ export class Callback {
 
   // 添加回调函数
   add(name, func) {
-    if (name === 'string' && typeof func === 'function') {
+    if (typeof name === 'string' && typeof func === 'function') {
       if (name in this.callbackDict) {
         this.callbackDict[name].push(func);
       } else {
@@ -57,8 +55,6 @@ export class Callback {
   remove(name) {
     if (typeof name === 'string' && name in this.callbackDict) {
       delete this.callbackDict[name];
-    } else {
-      this.callbackDict = {};
     }
   }
 
