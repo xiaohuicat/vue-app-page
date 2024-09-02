@@ -1,5 +1,672 @@
-var S=Object.defineProperty;var J=Object.getOwnPropertyDescriptor;var z=Object.getOwnPropertyNames;var q=Object.prototype.hasOwnProperty;var G=(o,t)=>{for(var e in t)S(o,e,{get:t[e],enumerable:!0})},E=(o,t,e,s)=>{if(t&&typeof t=="object"||typeof t=="function")for(let n of z(t))!q.call(o,n)&&n!==e&&S(o,n,{get:()=>t[n],enumerable:!(s=J(t,n))||s.enumerable});return o},d=(o,t,e)=>(E(o,t,"default"),e&&E(e,t,"default"));var m=class{constructor(t={}){this.callbackDict=t}add_hard(t,e){this.callbackDict[t]=e}add(t,e){if(t==="string"&&typeof e=="function")if(t in this.callbackDict){let s=Array.isArray(this.callbackDict[t])?this.callbackDict[t]:[this.callbackDict[t]];s.push(e),this.callbackDict[t]=s}else this.callbackDict[t]=e;t==="object"&&Object.keys(t).forEach(s=>{this.add(s,t[s])})}get(t){let e=this.callbackDict[t];return e?Array.isArray(e)?e:[e]:[]}getDict(){return this.callbackDict}run(t,...e){return this.get(t).map(s=>s(...e))}remove(t){t?delete this.callbackDict[t]:this.callbackDict={}}destroy(){this.callbackDict={}}};function T(o){return o!==null&&typeof o=="object"&&!Array.isArray(o)}function A(o,t,e){let s=t.split("."),n=o;for(let r=0;r<s.length;r++){if(!n[s[r]])return e;n=n[s[r]]}return n}function g(o,t,e){let s=t.split("."),n=o;for(let r=0;r<s.length-1;r++)n[s[r]]||(n[s[r]]={}),n=n[s[r]];return n[s[s.length-1]]=e,o}function L(o,t,e){let s=t.split("."),n=o;for(let r of s){if(!n[r])break;n=n[s[i]]}return n[s[s.length-1]]=e,o}function P(o,t,e){var s=new Blob([o],{type:e});if(window.navigator.msSaveOrOpenBlob)window.navigator.msSaveOrOpenBlob(s,t);else{var n=document.createElement("a"),r=URL.createObjectURL(s);n.href=r,n.download=t,document.body.appendChild(n),n.click(),setTimeout(function(){document.body.removeChild(n),window.URL.revokeObjectURL(r)},0)}}function F(o,t){var e=document.createElement("a");e.href=o,e.download=t,document.body.appendChild(e),e.click(),setTimeout(function(){document.body.removeChild(e),window.URL.revokeObjectURL(o)},0)}var c={};G(c,{compile:()=>H});d(c,rt);import{initCustomFormatter as ot}from"@vue/runtime-dom";import*as rt from"@vue/runtime-dom";var H=()=>{};var y=class{constructor(t){this.name=t||"LocalStore",this.data=null}get(t,e){let s;try{s=JSON.parse(localStorage.getItem(this.name))}catch{s={}}return s||(s={}),this.data,!t&&typeof t!="string"?s:A(s,t,e)}set(t,e){if(t){if(typeof t=="string")this.data=g(this.data,t,e);else if(typeof t=="object")for(let s of Object.keys(t))this.data||(this.data={}),this.data[s]=t[s]}}update(t,e){if(t){if(typeof t=="string")this.data=L(this.data,t,e);else if(typeof t=="object")for(let s of Object.keys(t))s in this.data&&(this.data||(this.data={}),this.data[s]=t[s])}}delete(t){t&&t in this.data&&delete this.get(t)}save(t,e){this.set(t,e),localStorage[this.name]=JSON.stringify(this.data)}free(){this.data=null}clear(){delete localStorage[this.name]}size(){let t=localStorage.getItem(this.name)||"";return new Blob([t]).size}};var D=class{constructor(){this.tasks=[],this.statusMap=new Map}add(t,e,s){let n=`task_${this.tasks.length}`;this.tasks.push({name:n,range:t,success:e,fail:s})}addList(t){t.forEach(e=>{this.add(e.range,e.success,e.fail)})}run(t){this.tasks.forEach(e=>{let{name:s,range:n,success:r,fail:a}=e;t>=n[0]&&t<n[1]?(this.statusMap.has(s)||this.statusMap.set(s,!1),this.statusMap.get(s)!==!0&&(r&&r(t),this.statusMap.set(s,!0))):(this.statusMap.has(s)||this.statusMap.set(s,!0),this.statusMap.get(s)!==!1&&(a&&a(t),this.statusMap.set(s,!1)))})}destroy(){this.tasks=[],this.statusMap.clear()}};var R={onMounted:c.onMounted,onBeforeMount:c.onBeforeMount,onBeforeUpdate:c.onBeforeUpdate,onUpdated:c.onUpdated,onUnmounted:c.onUnmounted,onBeforeUnmount:c.onBeforeUnmount,onLoad:c.onBeforeMount,onReady:c.onMounted,onDestroy:c.onUnmounted};function N(o,t){if(typeof o=="function")try{o.call(t)}catch(e){console.log(e)}}function _(o){return typeof o=="function"?(0,c.computed)(o):(0,c.ref)(o)}function M(o,t){for(let e in t)o[e]=_(t[e]);return o}function k(o,t){for(let e in t)o[e]=typeof t[e]=="function"?t[e]:()=>t[e];return o}var v=class{constructor(t){this.instance=(0,c.getCurrentInstance)();let{props:e,emit:s,proxy:n}=this.instance;this.props=e,this.emit=s,this.$=new Proxy({...n},{get:(r,a)=>typeof a=="string"&&a.indexOf("[getRef]")>-1?(a=a.replace("[getRef]",""),r[a]):(0,c.isRef)(r[a])?r[a].value:r[a],set:(r,a,f)=>typeof a=="string"&&a.indexOf("[setRef]")>-1?(a=a.replace("[setRef]",""),r[a]=(0,c.isRef)(f)?f:_(f),!0):(a in r&&(0,c.isRef)(r[a])?r[a].value=f:r[a]=f,!0)}),this.callback=new m,this.rangeTask=new D,this.local=new y(t||"app-page-store"),(0,c.onUnmounted)(()=>this?.destroy())}setRefs(t){this.instance.proxy=M(this.$,t)}setRef(t,e){let[s,...n]=t.split("."),r={};this.$&&s in this.$?(r=this.$[s],this.$["[setRef]"+s]=n.length>0?g(r,n.join("."),e):e):this.instance.proxy=M(this.$,{[t]:e})}getRef(t){return this.$["[getRef]"+t]}set(t,e){let[s,...n]=t.split("."),r={};this.$&&s in this.$?(r=this.$[s],this.$[s]=n.length>0?g(r,n.join("."),e):e):this.instance.proxy=M(this.$,{[t]:e})}get(t){return this.$[t]}setFuns(t){this.instance.proxy=k(this.$,t)}setFun(t,e){this.instance.proxy=k(this.$,{[t]:e})}getFun(t){return this.$[t]}watch(t,e){(0,c.watch)(t,(s,n)=>{typeof e=="function"?e(s,n):this.callback.run(e,s,n)})}watchRef(t,e){let[s,...n]=t.split(".");if(!(this.$&&s in this.$)){console.log(`refs\u4E2D\u6CA1\u6709\u8BE5${s}\uFF0C\u68C0\u67E5\u662F\u5426\u521D\u59CB\u5316\uFF01`);return}(0,c.watch)(()=>{let r=this.$[s];if(n.length)for(let a=0;a<n.length;a++)r=r[n[a]];return r},(r,a)=>{typeof e=="function"?e(r,a):this.callback.run(e,r,a)})}watchProps(t,e){if(!(this.props&&t in this.props)){console.log(`props\u4E2D\u6CA1\u6709\u8BE5${t}\uFF0C\u68C0\u67E5\u662F\u5426\u521D\u59CB\u5316\uFF01`);return}(0,c.watch)(this.props[t].value?this.props[t]:()=>this.props[t],(s,n)=>{typeof e=="function"?e(s,n):this.callback.run(e,s,n)})}setLives(t){if(T(t))for(let e in t)if(e in R){let s=t[e];if(typeof s!="function"){console.log(`${e}'s value need to be a function`);return}R[e](()=>N(s,this))}else console.log(`${e} is not a life function`)}setLive(t,e){if(typeof t=="string"&&typeof e=="function")if(t in R){if(typeof e!="function"){console.log("func need to be a function");return}R[t](()=>N(e,this))}else console.log(`${t} is not a life function`)}destroy(){this.instance=null,this.props=null,this.emit=null,this.proxy=null,this.$=null,this.local.free(),this.local=null,this.rangeTask.destroy(),this.rangeTask=null,this.callback.run("destroy"),this.callback.destroy(),this.callback=null}binds(t){for(let e in t){let s=t[e];typeof s=="function"?this[e]=(...n)=>s.call(this,...n):this[e]=s}}bind(t,e){typeof t=="string"&&(typeof e=="function"?this[t]=(...s)=>e.call(this,...s):this[t]=e)}};function K(o){o==""||o=="#"||o==null||(o.indexOf("[hard]")>-1?(o=o.replace("[hard]",""),document.location.href=o):this?.router?this.router.push({path:o}):document.location.href=o)}async function Q(o){try{await navigator.clipboard.writeText(o),this?.msg&&this.msg.showMsg("\u590D\u5236\u6210\u529F","success")}catch{let e=await navigator.permissions.query({name:"write-on-clipboard"});e.state=="granted"||e.state=="prompt"?this?.msg&&this.msg.showMsg("\u6CA1\u6709\u6743\u9650","fail"):this?.msg&&this.msg.showMsg("\u590D\u5236\u5931\u8D25","fail")}}var W={downloadFileByData:P,downloadFileByUrl:F,copyText:Q,goToUrl:K};function X(o){return o!==null&&typeof o=="object"&&!Array.isArray(o)}function Y(o,t){let e=o.indexOf(t);if(e!==-1){let s=o.substring(0,e),n=o.substring(e+t.length);return{left:s,right:n}}else return{left:o,right:""}}function Z({componentMap:o,template:t,props:e,events:s,mainClass:n="dyComponent"}){let r=0,a=t.split(`
-`),f=[];return a.forEach(l=>{if(!l||l.trim()==="")return;let b=l.match(/\{\{(.*?)\}\}/g);if(!b){f.push((0,c.h)("div",{class:n},l.trim()));return}let h=[],u=l;for(let w=0;w<b?.length;w++){let I=b[w].slice(2,-2),[j,U]=V(I),O={},C={},p=o?.[j],{left:x,right:B}=Y(u,b[w]);if(!p){h.push((0,c.h)("span",{},x+j)),u=B;continue}if(U||(typeof e=="function"?O=e(r):Array.isArray(e)&&e.length>r?O=e[r]:X(e)&&(O=e),r++),s)for(let $ of Object.keys(s))typeof s[$]=="function"&&(C[`on${$.slice(0,1).toUpperCase()+$.slice(1)}`]=s[$]);x&&x.trim()&&h.push((0,c.h)("span",{},x)),typeof p=="function"&&(p=p(e)),h.push((0,c.h)(p,{...O,...C,...U})),u=B}u&&h.push((0,c.h)("span",{},u)),f.push((0,c.h)("div",{class:n},h))}),(0,c.defineComponent)({render:()=>f})}function V(o){let t,e=null,s=o.match(/\([^)]*\)/g);if(!s)return t=o,[t,e];t=o.split(s[0])[0];let n=s[0].slice(1,-1);if(e={},n.length>0)try{e=JSON.parse(n)}catch{e.text=n}return[t,e]}var vt=v;export{m as Callback,y as LocalStore,v as Page,W as Tools,vt as default,Z as templateToComponment};
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+
+// src/Callback.js
+var Callback = class {
+  constructor(callbackDict = {}) {
+    this.callbackDict = {};
+    if (!callbackDict && typeof callbackDict === "object") {
+      Object.keys(callbackDict).forEach((each) => this.set(each, callbackDict[each]));
+    }
+  }
+  // 添加回调函数，如果存在则覆盖
+  set(name, func) {
+    if (name === "string" && typeof func === "function") {
+      this.callbackDict[name] = [func];
+    }
+    if (name === "string" && Array.isArray(func) && func.every((each) => typeof each === "function")) {
+      this.callbackDict[name] = func;
+    }
+  }
+  // 添加回调函数
+  add(name, func) {
+    if (typeof name === "string" && typeof func === "function") {
+      if (name in this.callbackDict) {
+        this.callbackDict[name].push(func);
+      } else {
+        this.callbackDict[name] = [func];
+      }
+      return;
+    }
+    if (name === "object") {
+      Object.keys(name).forEach((key) => {
+        this.add(key, name[key]);
+      });
+    }
+  }
+  // 获取回调函数列表
+  get(name) {
+    const callback = this.callbackDict[name];
+    return callback ? Array.isArray(callback) ? callback : [callback] : [];
+  }
+  getDict() {
+    return this.callbackDict;
+  }
+  // 运行回调函数
+  run(name, ...param) {
+    return this.get(name).map((callback) => callback(...param));
+  }
+  // 移除回调函数
+  remove(name) {
+    if (typeof name === "string" && name in this.callbackDict) {
+      delete this.callbackDict[name];
+    }
+  }
+  // 销毁回调管理对象
+  destroy() {
+    this.callbackDict = {};
+  }
+};
+
+// src/utils.js
+function isObject(obj) {
+  return obj !== null && typeof obj === "object" && !Array.isArray(obj);
+}
+function getObjectProperty(obj, key, default_value) {
+  const keys = key.split(".");
+  let current = obj;
+  for (let i2 = 0; i2 < keys.length; i2++) {
+    if (!current[keys[i2]]) {
+      return default_value;
+    }
+    current = current[keys[i2]];
+  }
+  return current;
+}
+function setObjectProperty(obj, key, value) {
+  const keys = key.split(".");
+  let current = obj;
+  for (let i2 = 0; i2 < keys.length - 1; i2++) {
+    if (!current[keys[i2]]) {
+      current[keys[i2]] = {};
+    }
+    current = current[keys[i2]];
+  }
+  current[keys[keys.length - 1]] = value;
+  return obj;
+}
+function setObjectExistProperty(obj, key, value) {
+  const keys = key.split(".");
+  let current = obj;
+  for (let key2 of keys) {
+    if (!current[key2]) {
+      break;
+    }
+    current = current[keys[i]];
+  }
+  current[keys[keys.length - 1]] = value;
+  return obj;
+}
+function downloadFileByData(data, filename, type) {
+  var file = new Blob([data], { type });
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(file, filename);
+  } else {
+    var a = document.createElement("a"), url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 0);
+  }
+}
+function downloadFileByUrl(url, filename) {
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 0);
+}
+
+// node_modules/.store/vue@3.4.38/node_modules/vue/dist/vue.runtime.esm-bundler.js
+var vue_runtime_esm_bundler_exports = {};
+__export(vue_runtime_esm_bundler_exports, {
+  compile: () => compile
+});
+__reExport(vue_runtime_esm_bundler_exports, runtime_dom_star);
+import { initCustomFormatter, warn } from "@vue/runtime-dom";
+import * as runtime_dom_star from "@vue/runtime-dom";
+function initDev() {
+  {
+    initCustomFormatter();
+  }
+}
+if (true) {
+  initDev();
+}
+var compile = () => {
+  if (true) {
+    warn(
+      `Runtime compilation is not supported in this build of Vue. Configure your bundler to alias "vue" to "vue/dist/vue.esm-bundler.js".`
+    );
+  }
+};
+
+// src/LocalStore.js
+var LocalStore = class {
+  constructor(name) {
+    this.name = name || "LocalStore";
+    this.data = null;
+  }
+  get(key, default_val) {
+    let data;
+    try {
+      data = JSON.parse(localStorage.getItem(this.name));
+    } catch (err) {
+      data = {};
+    }
+    if (!data) {
+      data = {};
+    }
+    this.data;
+    if (!key && typeof key != "string") {
+      return data;
+    }
+    return getObjectProperty(data, key, default_val);
+  }
+  set(key, value) {
+    if (!key) return;
+    if (typeof key == "string") {
+      this.data = setObjectProperty(this.data, key, value);
+    } else if (typeof key == "object") {
+      for (let each of Object.keys(key)) {
+        if (!this.data) {
+          this.data = {};
+        }
+        this.data[each] = key[each];
+      }
+    }
+  }
+  update(key, value) {
+    if (!key) return;
+    if (typeof key == "string") {
+      this.data = setObjectExistProperty(this.data, key, value);
+    } else if (typeof key == "object") {
+      for (let each of Object.keys(key)) {
+        if (each in this.data) {
+          if (!this.data) {
+            this.data = {};
+          }
+          this.data[each] = key[each];
+        }
+      }
+    }
+  }
+  delete(key) {
+    if (!key) return;
+    if (key in this.data) {
+      delete this.get(key);
+    }
+  }
+  save(key, value) {
+    this.set(key, value);
+    localStorage[this.name] = JSON.stringify(this.data);
+  }
+  free() {
+    this.data = null;
+  }
+  clear() {
+    delete localStorage[this.name];
+  }
+  size() {
+    let str = localStorage.getItem(this.name) || "";
+    return new Blob([str]).size;
+  }
+};
+
+// src/RangeTask.js
+var RangeTask = class {
+  constructor() {
+    this.tasks = [];
+    this.statusMap = /* @__PURE__ */ new Map();
+  }
+  add(range, success, fail) {
+    const name = `task_${this.tasks.length}`;
+    this.tasks.push({ name, range, success, fail });
+  }
+  addList(list) {
+    list.forEach((item) => {
+      this.add(item.range, item.success, item.fail);
+    });
+  }
+  run(val) {
+    this.tasks.forEach((task) => {
+      const { name, range, success, fail } = task;
+      if (val >= range[0] && val < range[1]) {
+        if (!this.statusMap.has(name)) {
+          this.statusMap.set(name, false);
+        }
+        if (this.statusMap.get(name) !== true) {
+          success && success(val);
+          this.statusMap.set(name, true);
+        }
+      } else {
+        if (!this.statusMap.has(name)) {
+          this.statusMap.set(name, true);
+        }
+        if (this.statusMap.get(name) !== false) {
+          fail && fail(val);
+          this.statusMap.set(name, false);
+        }
+      }
+    });
+  }
+  destroy() {
+    this.tasks = [];
+    this.statusMap.clear();
+  }
+};
+
+// src/Page.js
+var LIVE_MAP = {
+  onMounted: vue_runtime_esm_bundler_exports.onMounted,
+  onBeforeMount: vue_runtime_esm_bundler_exports.onBeforeMount,
+  onBeforeUpdate: vue_runtime_esm_bundler_exports.onBeforeUpdate,
+  onUpdated: vue_runtime_esm_bundler_exports.onUpdated,
+  onUnmounted: vue_runtime_esm_bundler_exports.onUnmounted,
+  onBeforeUnmount: vue_runtime_esm_bundler_exports.onBeforeUnmount,
+  onLoad: vue_runtime_esm_bundler_exports.onBeforeMount,
+  onReady: vue_runtime_esm_bundler_exports.onMounted,
+  onDestroy: vue_runtime_esm_bundler_exports.onUnmounted
+};
+function tryFunc(func, obj) {
+  if (typeof func === "function") {
+    try {
+      func.call(obj);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+}
+function createRef(val) {
+  if (typeof val === "function") {
+    return (0, vue_runtime_esm_bundler_exports.computed)(val);
+  } else {
+    return (0, vue_runtime_esm_bundler_exports.ref)(val);
+  }
+}
+function createRefs(ctx, obj) {
+  for (const key in obj) {
+    ctx[key] = createRef(obj[key]);
+  }
+  return ctx;
+}
+function createFuns(ctx, obj) {
+  for (const key in obj) {
+    ctx[key] = typeof obj[key] === "function" ? obj[key] : () => obj[key];
+  }
+  return ctx;
+}
+var Page = class {
+  constructor(localStoreName) {
+    this.instance = (0, vue_runtime_esm_bundler_exports.getCurrentInstance)();
+    const { props, emit, proxy } = this.instance;
+    this.props = props;
+    this.emit = emit;
+    this.$ = new Proxy(
+      { ...proxy },
+      {
+        get: (target, key) => {
+          if (typeof key === "string" && key.indexOf("[getRef]") > -1) {
+            key = key.replace("[getRef]", "");
+            return target[key];
+          }
+          return (0, vue_runtime_esm_bundler_exports.isRef)(target[key]) ? target[key].value : target[key];
+        },
+        set: (target, key, value) => {
+          if (typeof key === "string" && key.indexOf("[setRef]") > -1) {
+            key = key.replace("[setRef]", "");
+            target[key] = (0, vue_runtime_esm_bundler_exports.isRef)(value) ? value : createRef(value);
+            return true;
+          }
+          if (key in target) {
+            if ((0, vue_runtime_esm_bundler_exports.isRef)(target[key])) {
+              target[key].value = value;
+            } else {
+              target[key] = value;
+            }
+          } else {
+            target[key] = value;
+          }
+          return true;
+        }
+      }
+    );
+    this.callback = new Callback();
+    this.rangeTask = new RangeTask();
+    this.local = new LocalStore(localStoreName ? localStoreName : "app-page-store");
+    (0, vue_runtime_esm_bundler_exports.onUnmounted)(() => this?.destroy());
+  }
+  // ref对象的配置、获取和设置
+  setRefs(refs) {
+    this.instance["proxy"] = createRefs(this.$, refs);
+  }
+  setRef(key, value) {
+    let [head, ...others] = key.split(".");
+    let ref_value = {};
+    if (this.$ && head in this.$) {
+      ref_value = this.$[head];
+      this.$["[setRef]" + head] = others.length > 0 ? setObjectProperty(ref_value, others.join("."), value) : value;
+    } else {
+      this.instance["proxy"] = createRefs(this.$, { [key]: value });
+    }
+  }
+  getRef(key) {
+    return this.$["[getRef]" + key];
+  }
+  set(key, value) {
+    let [head, ...others] = key.split(".");
+    let ref_value = {};
+    if (this.$ && head in this.$) {
+      ref_value = this.$[head];
+      this.$[head] = others.length > 0 ? setObjectProperty(ref_value, others.join("."), value) : value;
+    } else {
+      this.instance["proxy"] = createRefs(this.$, { [key]: value });
+    }
+  }
+  get(key) {
+    return this.$[key];
+  }
+  setFuns(funs) {
+    this.instance["proxy"] = createFuns(this.$, funs);
+  }
+  setFun(key, value) {
+    this.instance["proxy"] = createFuns(this.$, { [key]: value });
+  }
+  getFun(key) {
+    return this.$[key];
+  }
+  // watch数据对象
+  watch(ref_or_fun, callback) {
+    (0, vue_runtime_esm_bundler_exports.watch)(ref_or_fun, (newValue, oldValue) => {
+      if (typeof callback === "function") {
+        callback(newValue, oldValue);
+      } else {
+        this.callback.run(callback, newValue, oldValue);
+      }
+    });
+  }
+  // watch数据对象
+  watchRef(name, callback) {
+    let [head, ...others] = name.split(".");
+    if (!(this.$ && head in this.$)) {
+      console.log(`refs\u4E2D\u6CA1\u6709\u8BE5${head}\uFF0C\u68C0\u67E5\u662F\u5426\u521D\u59CB\u5316\uFF01`);
+      return;
+    }
+    (0, vue_runtime_esm_bundler_exports.watch)(
+      () => {
+        let ref_value = this.$[head];
+        if (others.length) {
+          for (let i2 = 0; i2 < others.length; i2++) {
+            ref_value = ref_value[others[i2]];
+          }
+        }
+        return ref_value;
+      },
+      (newValue, oldValue) => {
+        if (typeof callback === "function") {
+          callback(newValue, oldValue);
+        } else {
+          this.callback.run(callback, newValue, oldValue);
+        }
+      }
+    );
+  }
+  // watch数据对象
+  watchProps(name, callback) {
+    if (!(this.props && name in this.props)) {
+      console.log(`props\u4E2D\u6CA1\u6709\u8BE5${name}\uFF0C\u68C0\u67E5\u662F\u5426\u521D\u59CB\u5316\uFF01`);
+      return;
+    }
+    (0, vue_runtime_esm_bundler_exports.watch)(
+      this.props[name].value ? this.props[name] : () => this.props[name],
+      (newValue, oldValue) => {
+        if (typeof callback === "function") {
+          callback(newValue, oldValue);
+        } else {
+          this.callback.run(callback, newValue, oldValue);
+        }
+      }
+    );
+  }
+  // 生命周期的函数的配置和设置
+  setLives(LIVE) {
+    if (isObject(LIVE)) {
+      for (let key in LIVE) {
+        if (key in LIVE_MAP) {
+          let func = LIVE[key];
+          if (typeof func !== "function") {
+            console.log(`${key}'s value need to be a function`);
+            return;
+          }
+          LIVE_MAP[key](() => tryFunc(func, this));
+        } else {
+          console.log(`${key} is not a life function`);
+        }
+      }
+    }
+  }
+  setLive(name, func) {
+    if (typeof name === "string" && typeof func === "function") {
+      if (name in LIVE_MAP) {
+        if (typeof func !== "function") {
+          console.log(`func need to be a function`);
+          return;
+        }
+        LIVE_MAP[name](() => tryFunc(func, this));
+      } else {
+        console.log(`${name} is not a life function`);
+      }
+    }
+  }
+  destroy() {
+    this.instance = null;
+    this.props = null;
+    this.emit = null;
+    this.proxy = null;
+    this.$ = null;
+    this.local.free();
+    this.local = null;
+    this.rangeTask.destroy();
+    this.rangeTask = null;
+    this.callback.run("destroy");
+    this.callback.destroy();
+    this.callback = null;
+  }
+  binds(options) {
+    for (let key in options) {
+      const val = options[key];
+      if (typeof val === "function") {
+        this[key] = (...args) => val.call(this, ...args);
+      } else {
+        this[key] = val;
+      }
+    }
+  }
+  bind(key, val) {
+    if (typeof key !== "string") return;
+    if (typeof val === "function") {
+      this[key] = (...args) => val.call(this, ...args);
+    } else {
+      this[key] = val;
+    }
+  }
+};
+
+// src/Tools.js
+function goToUrl(url) {
+  if (url == "" || url == "#" || url == void 0) {
+    return;
+  } else if (url.indexOf("[hard]") > -1) {
+    url = url.replace("[hard]", "");
+    document.location.href = url;
+  } else {
+    if (this?.router) {
+      this.router.push({ path: url });
+    } else {
+      document.location.href = url;
+    }
+  }
+}
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    this?.msg && this.msg.showMsg("\u590D\u5236\u6210\u529F", "success");
+  } catch (err) {
+    let result = await navigator.permissions.query({ name: "write-on-clipboard" });
+    if (result.state == "granted" || result.state == "prompt") {
+      this?.msg && this.msg.showMsg("\u6CA1\u6709\u6743\u9650", "fail");
+    } else {
+      this?.msg && this.msg.showMsg("\u590D\u5236\u5931\u8D25", "fail");
+    }
+  }
+}
+var Tools_default = {
+  downloadFileByData,
+  downloadFileByUrl,
+  copyText,
+  goToUrl
+};
+
+// src/templateParse.js
+function isObject2(obj) {
+  return obj !== null && typeof obj === "object" && !Array.isArray(obj);
+}
+function cutString(string, piece) {
+  const index = string.indexOf(piece);
+  if (index !== -1) {
+    const left = string.substring(0, index);
+    const right = string.substring(index + piece.length);
+    return { left, right };
+  } else {
+    return { left: string, right: "" };
+  }
+}
+function templateToComponment({
+  componentMap,
+  template,
+  props,
+  events,
+  mainClass = "dyComponent"
+}) {
+  let index = 0;
+  const templates = template.split("\n");
+  const vnode = [];
+  templates.forEach((template2) => {
+    if (!template2 || template2.trim() === "") {
+      return;
+    }
+    const matchs = template2.match(/\{\{(.*?)\}\}/g);
+    if (!matchs) {
+      vnode.push((0, vue_runtime_esm_bundler_exports.h)("div", { class: mainClass }, template2.trim()));
+      return;
+    }
+    const children = [];
+    let parseTemplate = template2;
+    for (let i2 = 0; i2 < matchs?.length; i2++) {
+      const instruction = matchs[i2].slice(2, -2);
+      const [componentName, params] = getComponentByInstruction(instruction);
+      let componentProps = {};
+      let componentEvents = {};
+      let component = componentMap?.[componentName];
+      const { left, right } = cutString(parseTemplate, matchs[i2]);
+      if (!component) {
+        children.push((0, vue_runtime_esm_bundler_exports.h)("span", {}, left + componentName));
+        parseTemplate = right;
+        continue;
+      }
+      if (!params) {
+        if (typeof props === "function") {
+          componentProps = props(index);
+        } else if (Array.isArray(props) && props.length > index) {
+          componentProps = props[index];
+        } else if (isObject2(props)) {
+          componentProps = props;
+        }
+        index++;
+      }
+      if (events) {
+        for (let eventName of Object.keys(events)) {
+          if (typeof events[eventName] === "function") {
+            componentEvents[`on${eventName.slice(0, 1).toUpperCase() + eventName.slice(1)}`] = events[eventName];
+          }
+        }
+      }
+      if (left && left.trim()) {
+        children.push((0, vue_runtime_esm_bundler_exports.h)("span", {}, left));
+      }
+      if (typeof component === "function") {
+        component = component(props);
+      }
+      children.push(
+        (0, vue_runtime_esm_bundler_exports.h)(component, {
+          ...componentProps,
+          ...componentEvents,
+          ...params
+        })
+      );
+      parseTemplate = right;
+    }
+    if (parseTemplate) {
+      children.push((0, vue_runtime_esm_bundler_exports.h)("span", {}, parseTemplate));
+    }
+    vnode.push((0, vue_runtime_esm_bundler_exports.h)("div", { class: mainClass }, children));
+  });
+  return (0, vue_runtime_esm_bundler_exports.defineComponent)({ render: () => vnode });
+}
+function getComponentByInstruction(instruction) {
+  let componentName;
+  let param = null;
+  const matchs = instruction.match(/\([^)]*\)/g);
+  if (!matchs) {
+    componentName = instruction;
+    return [componentName, param];
+  }
+  componentName = instruction.split(matchs[0])[0];
+  const paramStr = matchs[0].slice(1, -1);
+  param = {};
+  if (paramStr.length > 0) {
+    try {
+      param = JSON.parse(paramStr);
+    } catch (error) {
+      param.text = paramStr;
+    }
+  }
+  return [componentName, param];
+}
+
+// src/index.js
+var src_default = Page;
+export {
+  Callback,
+  LocalStore,
+  Page,
+  Tools_default as Tools,
+  src_default as default,
+  templateToComponment
+};
 /*! Bundled license information:
 
 vue/dist/vue.runtime.esm-bundler.js:

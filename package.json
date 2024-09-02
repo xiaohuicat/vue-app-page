@@ -1,6 +1,6 @@
 {
   "name": "app-page",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "create your vue3 app easily",
   "main": "src/index.js",
   "scripts": {

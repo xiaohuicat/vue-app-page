@@ -83,3 +83,18 @@ page.local.clear();
 // 查看数据大小
 page.local.size();
 ```
+
+# 回调使用
+```javascript
+// 添加回调
+page.callback.add('login', func);
+// 覆盖回调
+page.callback.set('login', func);
+// 移除回调
+page.callback.remove('login');
+// 获取回调，返回一个函数列表
+page.callback.get('login');
+// 执行回调，没有挂载函数也可以安全执行
+page.callback.run('login', params);
+// 清空回调
+page.callback.destroy();
