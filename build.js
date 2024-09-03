@@ -2,7 +2,7 @@ const { build } = require('esbuild');
 
 build({
   entryPoints: ['./src/index.js'],
-  outfile: './dist/app-page-min.js',
+  outfile: './dist/app-page.js',
   bundle: true,
   // minify: true,
   platform: 'browser', // 设置为浏览器平台

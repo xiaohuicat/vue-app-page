@@ -42,10 +42,6 @@ export class Callback {
     return callback ? (Array.isArray(callback) ? callback : [callback]) : [];
   }
 
-  getDict() {
-    return this.callbackDict;
-  }
-
   // 运行回调函数
   run(name, ...param) {
     return this.get(name).map(callback => callback(...param));

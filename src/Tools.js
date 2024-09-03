@@ -1,6 +1,8 @@
-import { downloadFileByData, downloadFileByUrl } from './utils';
 
-// 跳转页面
+/**
+ * 跳转页面
+ * @param {String} url 跳转的url
+ */
 function goToUrl(url) {
   if (url == '' || url == '#' || url == undefined) {
     return;
@@ -16,7 +18,10 @@ function goToUrl(url) {
   }
 }
 
-// 复制文本
+/**
+ * 复制文本
+ * @param {String} text 文本内容
+ */
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
@@ -31,6 +36,50 @@ async function copyText(text) {
       this?.msg && this.msg.showMsg('复制失败', 'fail');
     }
   }
+}
+
+/**
+ * 下载文件
+ * @param {String} data 文件数据
+ * @param {String} filename 文件名
+ * @param {String} type 文件类型
+ */
+function downloadFileByData(data, filename, type) {
+  var file = new Blob([data], { type: type });
+
+  if (window.navigator.msSaveOrOpenBlob) {
+    // IE10+
+    window.navigator.msSaveOrOpenBlob(file, filename);
+  } else {
+    // Others
+    var a = document.createElement('a'),
+      url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 0);
+  }
+}
+
+/**
+ * 下载文件
+ * @param {String} url 文件路径
+ * @param {String} filename 文件名
+ */
+function downloadFileByUrl(url, filename) {
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 0);
 }
 
 export default {

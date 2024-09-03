@@ -19,22 +19,29 @@ var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "defau
 // src/Callback.js
 var Callback = class {
   constructor(callbackDict = {}) {
-    this.callbackDict = callbackDict;
+    this.callbackDict = {};
+    if (!callbackDict && typeof callbackDict === "object") {
+      Object.keys(callbackDict).forEach((each) => this.set(each, callbackDict[each]));
+    }
   }
-  // 添加回调函数，如果存在则替换
-  add_hard(name, func) {
-    this.callbackDict[name] = func;
+  // 添加回调函数，如果存在则覆盖
+  set(name, func) {
+    if (name === "string" && typeof func === "function") {
+      this.callbackDict[name] = [func];
+    }
+    if (name === "string" && Array.isArray(func) && func.every((each) => typeof each === "function")) {
+      this.callbackDict[name] = func;
+    }
   }
   // 添加回调函数
   add(name, func) {
-    if (name === "string" && typeof func === "function") {
+    if (typeof name === "string" && typeof func === "function") {
       if (name in this.callbackDict) {
-        const callbacks = Array.isArray(this.callbackDict[name]) ? this.callbackDict[name] : [this.callbackDict[name]];
-        callbacks.push(func);
-        this.callbackDict[name] = callbacks;
+        this.callbackDict[name].push(func);
       } else {
-        this.callbackDict[name] = func;
+        this.callbackDict[name] = [func];
       }
+      return;
     }
     if (name === "object") {
       Object.keys(name).forEach((key) => {
@@ -47,19 +54,14 @@ var Callback = class {
     const callback = this.callbackDict[name];
     return callback ? Array.isArray(callback) ? callback : [callback] : [];
   }
-  getDict() {
-    return this.callbackDict;
-  }
   // 运行回调函数
   run(name, ...param) {
     return this.get(name).map((callback) => callback(...param));
   }
   // 移除回调函数
   remove(name) {
-    if (name) {
+    if (typeof name === "string" && name in this.callbackDict) {
       delete this.callbackDict[name];
-    } else {
-      this.callbackDict = {};
     }
   }
   // 销毁回调管理对象
@@ -72,67 +74,27 @@ var Callback = class {
 function isObject(obj) {
   return obj !== null && typeof obj === "object" && !Array.isArray(obj);
 }
-function getObjectProperty(obj, key, default_value) {
-  const keys = key.split(".");
-  let current = obj;
-  for (let i2 = 0; i2 < keys.length; i2++) {
-    if (!current[keys[i2]]) {
-      return default_value;
-    }
-    current = current[keys[i2]];
-  }
-  return current;
-}
 function setObjectProperty(obj, key, value) {
   const keys = key.split(".");
   let current = obj;
-  for (let i2 = 0; i2 < keys.length - 1; i2++) {
-    if (!current[keys[i2]]) {
-      current[keys[i2]] = {};
+  for (let i = 0; i < keys.length - 1; i++) {
+    const keyPart = keys[i];
+    const nextKeyPart = keys[i + 1];
+    const isNextKeyPartArrayIndex = !isNaN(nextKeyPart);
+    if (isNextKeyPartArrayIndex) {
+      if (!Array.isArray(current[keyPart])) {
+        current[keyPart] = [];
+      }
+    } else {
+      if (typeof current[keyPart] !== "object" || current[keyPart] === null) {
+        current[keyPart] = {};
+      }
     }
-    current = current[keys[i2]];
+    current = current[keyPart];
   }
-  current[keys[keys.length - 1]] = value;
+  const finalKeyPart = keys[keys.length - 1];
+  current[finalKeyPart] = value;
   return obj;
-}
-function setObjectExistProperty(obj, key, value) {
-  const keys = key.split(".");
-  let current = obj;
-  for (let key2 of keys) {
-    if (!current[key2]) {
-      break;
-    }
-    current = current[keys[i]];
-  }
-  current[keys[keys.length - 1]] = value;
-  return obj;
-}
-function downloadFileByData(data, filename, type) {
-  var file = new Blob([data], { type });
-  if (window.navigator.msSaveOrOpenBlob) {
-    window.navigator.msSaveOrOpenBlob(file, filename);
-  } else {
-    var a = document.createElement("a"), url = URL.createObjectURL(file);
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function() {
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    }, 0);
-  }
-}
-function downloadFileByUrl(url, filename) {
-  var a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function() {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 0);
 }
 
 // node_modules/.store/vue@3.4.38/node_modules/vue/dist/vue.runtime.esm-bundler.js
@@ -160,74 +122,50 @@ var compile = () => {
 };
 
 // src/LocalStore.js
+function verifiedString(string) {
+  return typeof string === "string" && string.trim() !== "";
+}
 var LocalStore = class {
   constructor(name) {
     this.name = name || "LocalStore";
-    this.data = null;
   }
   get(key, default_val) {
-    let data;
+    let data = {};
     try {
-      data = JSON.parse(localStorage.getItem(this.name));
+      data = JSON.parse(localStorage.getItem(this.name)) || {};
     } catch (err) {
-      data = {};
     }
-    if (!data) {
-      data = {};
-    }
-    this.data;
-    if (!key && typeof key != "string") {
+    if (!verifiedString(key)) {
       return data;
     }
-    return getObjectProperty(data, key, default_val);
+    if (typeof data === "object" && data !== null && key in data) {
+      return data[key];
+    }
+    return default_val;
   }
   set(key, value) {
-    if (!key) return;
-    if (typeof key == "string") {
-      this.data = setObjectProperty(this.data, key, value);
-    } else if (typeof key == "object") {
-      for (let each of Object.keys(key)) {
-        if (!this.data) {
-          this.data = {};
-        }
-        this.data[each] = key[each];
-      }
-    }
-  }
-  update(key, value) {
-    if (!key) return;
-    if (typeof key == "string") {
-      this.data = setObjectExistProperty(this.data, key, value);
-    } else if (typeof key == "object") {
-      for (let each of Object.keys(key)) {
-        if (each in this.data) {
-          if (!this.data) {
-            this.data = {};
-          }
-          this.data[each] = key[each];
-        }
-      }
+    if (verifiedString(key)) {
+      const data = this.get();
+      data[key] = value;
+      localStorage[this.name] = JSON.stringify(data);
+    } else if (key && typeof key == "object") {
+      Object.keys(key).forEach((each) => this.set(each, key[each]));
     }
   }
   delete(key) {
-    if (!key) return;
-    if (key in this.data) {
-      delete this.get(key);
+    if (!verifiedString(key)) return;
+    const data = this.get();
+    if (key in data) {
+      delete data[key];
     }
-  }
-  save(key, value) {
-    this.set(key, value);
-    localStorage[this.name] = JSON.stringify(this.data);
-  }
-  free() {
-    this.data = null;
+    localStorage[this.name] = JSON.stringify(data);
   }
   clear() {
-    delete localStorage[this.name];
+    delete localStorage.removeItem(this.name);
   }
   size() {
-    let str = localStorage.getItem(this.name) || "";
-    return new Blob([str]).size;
+    const str = localStorage.getItem(this.name) || "";
+    return new TextEncoder().encode(str).length;
   }
 };
 
@@ -414,8 +352,8 @@ var Page = class {
       () => {
         let ref_value = this.$[head];
         if (others.length) {
-          for (let i2 = 0; i2 < others.length; i2++) {
-            ref_value = ref_value[others[i2]];
+          for (let i = 0; i < others.length; i++) {
+            ref_value = ref_value[others[i]];
           }
         }
         return ref_value;
@@ -538,6 +476,33 @@ async function copyText(text) {
     }
   }
 }
+function downloadFileByData(data, filename, type) {
+  var file = new Blob([data], { type });
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(file, filename);
+  } else {
+    var a = document.createElement("a"), url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 0);
+  }
+}
+function downloadFileByUrl(url, filename) {
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 0);
+}
 var Tools_default = {
   downloadFileByData,
   downloadFileByUrl,
@@ -580,13 +545,13 @@ function templateToComponment({
     }
     const children = [];
     let parseTemplate = template2;
-    for (let i2 = 0; i2 < matchs?.length; i2++) {
-      const instruction = matchs[i2].slice(2, -2);
+    for (let i = 0; i < matchs?.length; i++) {
+      const instruction = matchs[i].slice(2, -2);
       const [componentName, params] = getComponentByInstruction(instruction);
       let componentProps = {};
       let componentEvents = {};
       let component = componentMap?.[componentName];
-      const { left, right } = cutString(parseTemplate, matchs[i2]);
+      const { left, right } = cutString(parseTemplate, matchs[i]);
       if (!component) {
         children.push((0, vue_runtime_esm_bundler_exports.h)("span", {}, left + componentName));
         parseTemplate = right;

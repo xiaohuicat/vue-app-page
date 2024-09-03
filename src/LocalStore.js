@@ -1,84 +1,61 @@
-import { getObjectProperty, setObjectExistProperty, setObjectProperty } from './utils';
+/**
+ * 通过校验的字符串
+ * @param {*} string
+ */
+function verifiedString(string) {
+  return typeof string === 'string' && string.trim() !== '';
+}
+
 
 // 本地数据存储
 export class LocalStore {
   constructor(name) {
     this.name = name || 'LocalStore';
-    this.data = null;
   }
 
   get(key, default_val) {
-    let data;
+    let data = {};
     try {
-      data = JSON.parse(localStorage.getItem(this.name));
-    } catch (err) {
-      data = {};
-    }
+      data = JSON.parse(localStorage.getItem(this.name)) || {};
+    } catch (err) {}
 
-    if (!data) {
-      data = {};
-    }
-    this.data;
-
-    if (!key && typeof key != 'string') {
+    if (!verifiedString(key)) {
       return data;
     }
 
-    return getObjectProperty(data, key, default_val);
-  }
-
-  set(key, value) {
-    if (!key) return;
-    if (typeof key == 'string') {
-      this.data = setObjectProperty(this.data, key, value);
-    } else if (typeof key == 'object') {
-      for (let each of Object.keys(key)) {
-        if (!this.data) {
-          this.data = {};
-        }
-        this.data[each] = key[each];
-      }
+    if (typeof data === 'object' && data !== null && key in data) {
+      return data[key];
     }
-  }
 
-  update(key, value) {
-    if (!key) return;
-    if (typeof key == 'string') {
-      this.data = setObjectExistProperty(this.data, key, value);
-    } else if (typeof key == 'object') {
-      for (let each of Object.keys(key)) {
-        if (each in this.data) {
-          if (!this.data) {
-            this.data = {};
-          }
-          this.data[each] = key[each];
-        }
-      }
+    return default_val;
+  }
+  
+  set(key, value) {
+    if (verifiedString(key)) {
+      const data = this.get();
+      data[key] = value;
+      localStorage[this.name] = JSON.stringify(data);
+    } else if (key && typeof key == 'object') {
+      Object.keys(key).forEach(each => this.set(each, key[each]));
     }
   }
 
   delete(key) {
-    if (!key) return;
-    if (key in this.data) {
-      delete this.get(key);
+    if (!verifiedString(key)) return;
+    const data = this.get();
+    if (key in data) {
+      delete data[key];
     }
-  }
 
-  save(key, value) {
-    this.set(key, value);
-    localStorage[this.name] = JSON.stringify(this.data);
-  }
-
-  free() {
-    this.data = null;
+    localStorage[this.name] = JSON.stringify(data);
   }
 
   clear() {
-    delete localStorage[this.name];
+    delete localStorage.removeItem(this.name);
   }
 
   size() {
-    let str = localStorage.getItem(this.name) || '';
-    return new Blob([str]).size;
-  }
+    const str = localStorage.getItem(this.name) || '';
+    return new TextEncoder().encode(str).length;
+  }  
 }

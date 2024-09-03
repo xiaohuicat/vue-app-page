@@ -66,19 +66,13 @@ page.setFuns({clear: () => { $.num = 0; }});
 
 # 数据加载
 ```javascript
-// 获取本地数据，key可以是'a.b.c'，根据 '.' 分隔逐层取对象属性，key为空时获取全部
+// 获取本地数据
 page.local.get(key);
-// 设置本地数据, key可以是'a.b.c'，根据 '.' 分隔逐层设置对象属性
+// 设置本地数据
 page.local.set(key, value);
-// 更新本地数据，没有值时不更新，返回false，否则更新，返回true。
-page.local.update(key, value);
-// 删除本地数据，没有值时，返回false，否则返回true。
+// 删除本地数据
 page.local.delete(key);
-// 设置并保存本地数据，没有值时直接保存数据
-page.local.save(key, value);
-// 释放数据，解除引用，不删除本地数据
-page.local.free();
-// 清除数据，解除引用，删除本地数据
+// 清除数据
 page.local.clear();
 // 查看数据大小
 page.local.size();
