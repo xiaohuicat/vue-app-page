@@ -54,6 +54,10 @@ export class LocalStore {
     delete localStorage.removeItem(this.name);
   }
 
+  save(key, value) {
+    this.set(key, value);
+  }
+
   size() {
     const str = localStorage.getItem(this.name) || '';
     return new TextEncoder().encode(str).length;

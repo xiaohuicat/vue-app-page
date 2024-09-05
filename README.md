@@ -70,6 +70,8 @@ page.setFuns({clear: () => { $.num = 0; }});
 page.local.get(key);
 // 设置本地数据
 page.local.set(key, value);
+// 报错本地数据，和set功能一样
+page.local.save(key, value);
 // 删除本地数据
 page.local.delete(key);
 // 清除数据
