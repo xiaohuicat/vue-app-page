@@ -8,11 +8,11 @@ export class Callback {
 
   // 添加回调函数，如果存在则覆盖
   set(name, func) {
-    if (name === 'string' && typeof func === 'function') {
+    if (typeof name === 'string' && typeof func === 'function') {
       this.callbackDict[name] = [func];
     }
 
-    if (name === 'string' && Array.isArray(func) && func.every(each => typeof each === 'function')) {
+    if (typeof name === 'string' && Array.isArray(func) && func.every(each => typeof each === 'function')) {
       this.callbackDict[name] = func;
     }
   }
@@ -29,7 +29,7 @@ export class Callback {
       return;
     }
 
-    if (name === 'object') {
+    if (typeof name === 'object') {
       Object.keys(name).forEach((key) => {
         this.add(key, name[key]);
       });
