@@ -14,8 +14,8 @@ import {
   computed
 } from 'vue';
 import { LocalStore } from './LocalStore';
-import { RangeTask } from './RangeTask';
-import { msg } from './Msg';
+import { tips } from './Tips';
+import { usePageScroller } from './PageScroller';
 
 const LIVE_MAP = {
   onMounted,
@@ -102,12 +102,9 @@ export class Page {
       }
     );
 
+    this.pageScroller = usePageScroller();
     this.callback = new Callback();
-    this.rangeTask = new RangeTask();
     this.local = new LocalStore(localStoreName ? localStoreName : 'app-page-store');
-
-    // vue卸载时自动销毁
-    onUnmounted(() => this?.destroy());
   }
 
   // ref对象的配置、获取和设置
@@ -253,13 +250,11 @@ export class Page {
     this.emit = null;
     this.proxy = null;
     this.$ = null;
-    this.local.free();
     this.local = null;
-    this.rangeTask.destroy();
-    this.rangeTask = null;
     this.callback.run('destroy');
     this.callback.destroy();
     this.callback = null;
+    this.pageScroller = null;
   }
 
   binds(options) {
@@ -283,6 +278,10 @@ export class Page {
   }
 
   tips(text, type = 'default', duration = 1.5) {
-    msg.show(text, type, duration);
+    tips(text, type, duration);
+  }
+
+  scroll(status) {
+    status ? this.pageScroller.show() : this.pageScroller.hide();
   }
 }

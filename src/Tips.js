@@ -2,9 +2,9 @@
 show方法传入两个参数，消息内容（content）和消息样式（style）均为字符串
 style的值可取一下四种 'default'、'success'、'fail'、'warning'
 duration为消息显示时长，单位为秒，默认为1.5秒 */
-class Msg {
+class Tips {
   constructor() {
-    this.id = 'app-page-tips'
+    this.id = 'app-page-tips';
     this.container;
     this.inner;
     this.style;
@@ -20,7 +20,7 @@ class Msg {
       this.container.appendChild(this.inner);
     }
 
-    if(!this.style) {
+    if (!this.style) {
       this.style = document.createElement('style');
       this.style.setAttribute('type', 'text/css');
       this.style.setAttribute(this.id + '-style', '');
@@ -76,12 +76,12 @@ class Msg {
 #app-page-tips-container .msg-hide {
   display: none;
 }
-`
+`;
       document.head.appendChild(this.style);
     }
   }
 
-  show(content, style = 'default', duration = 1.5) {
+  tips(content, style = 'default', duration = 1.5) {
     if (!this.div) this.init();
     clearTimeout(this.timer);
     this.inner.setAttribute('class', `app-page-tips msg-${style}`);
@@ -98,4 +98,17 @@ class Msg {
   }
 }
 
-export const msg = new Msg();
+let msg;
+
+function useTips() {
+  return msg ? msg : new Tips();
+}
+
+function tips(text, type = 'default', duration = 1.5) {
+  useTips().tips(text, type, duration);
+}
+
+export {
+  useTips,
+  tips,
+}

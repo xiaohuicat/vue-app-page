@@ -2,7 +2,7 @@ export class Callback {
   constructor(callbackDict = {}) {
     this.callbackDict = {};
     if (callbackDict && typeof callbackDict === 'object') {
-      Object.keys(callbackDict).forEach(each => this.set(each, callbackDict[each]));
+      Object.keys(callbackDict).forEach((each) => this.set(each, callbackDict[each]));
     }
   }
 
@@ -12,7 +12,11 @@ export class Callback {
       this.callbackDict[name] = [func];
     }
 
-    if (typeof name === 'string' && Array.isArray(func) && func.every(each => typeof each === 'function')) {
+    if (
+      typeof name === 'string' &&
+      Array.isArray(func) &&
+      func.every((each) => typeof each === 'function')
+    ) {
       this.callbackDict[name] = func;
     }
   }
@@ -44,7 +48,7 @@ export class Callback {
 
   // 运行回调函数
   run(name, ...param) {
-    return this.get(name).map(callback => callback(...param));
+    return this.get(name).map((callback) => callback(...param));
   }
 
   // 移除回调函数

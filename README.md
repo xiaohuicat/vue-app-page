@@ -48,7 +48,7 @@ page.setLive('onLoad', func);
 在<script setup></script>中使用
 ```javascript
 import { Page } from 'app-page';
-const page = new Page;
+const page = new Page();
 const { $ } = page;
 page.setRefs({
   num: 0,                             // 响应式数据ref
@@ -69,6 +69,8 @@ page.setFuns({clear: () => { $.num = 0; }});
 # 数据加载
 1、在page中直接使用，page.local
 ```javascript
+// 默认从本地数据app-page-store中获取
+page.local.get('version');
 // 获取本地数据page001中的name
 page.local.setName('page001').get('name');
 ```
@@ -116,9 +118,9 @@ callback.destroy();
 
 # 消息提示
 1、在page中直接使用，page.tips
-2、从app-page引入msg，msg.tips。
+2、从app-page引入tips
 ```javascript
-import { msg } from 'app-page';
+import { tips } from 'app-page';
 /**
  * tips(content, type, duration) 可输入三个参数
  * content: 提示内容
@@ -129,9 +131,9 @@ page.tips('默认信息');
 page.tips('成功信息', 'success');
 page.tips('失败信息', 'fail', 3);
 
-msg.tips('默认信息');
-msg.tips('成功信息', 'success');
-msg.tips('失败信息', 'fail', 3);
+tips('默认信息');
+tips('成功信息', 'success');
+tips('失败信息', 'fail', 3);
 ```
 
 # 显示隐藏面板

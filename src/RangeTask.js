@@ -3,15 +3,19 @@ export class RangeTask {
     this.tasks = [];
     this.statusMap = new Map();
   }
+
   add(range, success, fail) {
+    if (Array.isArray(range)) {
+      range.forEach((item) => {
+        this.add(item.range, item.success, item.fail);
+      });
+      return;
+    }
+
     const name = `task_${this.tasks.length}`;
     this.tasks.push({ name, range, success, fail });
   }
-  addList(list) {
-    list.forEach((item) => {
-      this.add(item.range, item.success, item.fail);
-    });
-  }
+
   run(val) {
     this.tasks.forEach((task) => {
       const { name, range, success, fail } = task;
@@ -34,6 +38,7 @@ export class RangeTask {
       }
     });
   }
+
   destroy() {
     this.tasks = [];
     this.statusMap.clear();

@@ -6,7 +6,6 @@ function verifiedString(string) {
   return typeof string === 'string' && string.trim() !== '';
 }
 
-
 // 本地数据存储
 export class LocalStore {
   constructor(name) {
@@ -34,14 +33,14 @@ export class LocalStore {
 
     return default_val;
   }
-  
+
   set(key, value) {
     if (verifiedString(key)) {
       const data = this.get();
       data[key] = value;
       localStorage[this.name] = JSON.stringify(data);
     } else if (key && typeof key == 'object') {
-      Object.keys(key).forEach(each => this.set(each, key[each]));
+      Object.keys(key).forEach((each) => this.set(each, key[each]));
     }
   }
 
@@ -66,5 +65,5 @@ export class LocalStore {
   size() {
     const str = localStorage.getItem(this.name) || '';
     return new TextEncoder().encode(str).length;
-  }  
+  }
 }

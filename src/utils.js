@@ -47,8 +47,4 @@ function setObjectProperty(obj, key, value) {
   return obj;
 }
 
-export {
-  isObject,
-  getObjectProperty,
-  setObjectProperty,
-};
+export { isObject, getObjectProperty, setObjectProperty };

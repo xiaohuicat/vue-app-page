@@ -4,7 +4,8 @@ import { LocalStore } from './LocalStore';
 import { Callback } from './Callback';
 import { templateToComponment } from './templateParse';
 import { CallPanel, watchPanelEvent } from './CallPanel';
-import { msg } from './Msg';
+import { useTips, tips } from './Tips';
+import { usePageScroller } from './PageScroller';
 
 export default Page;
 export {
@@ -13,7 +14,9 @@ export {
   CallPanel,
   watchPanelEvent,
   Page,
-  msg,
+  useTips,
+  tips,
   Tools,
-  templateToComponment,
+  usePageScroller,
+  templateToComponment
 };

@@ -129,6 +129,10 @@ var LocalStore = class {
   constructor(name) {
     this.name = name || "LocalStore";
   }
+  setName(name) {
+    this.name = name;
+    return this;
+  }
   get(key, default_val) {
     let data = {};
     try {
@@ -172,51 +176,8 @@ var LocalStore = class {
   }
 };
 
-// src/RangeTask.js
-var RangeTask = class {
-  constructor() {
-    this.tasks = [];
-    this.statusMap = /* @__PURE__ */ new Map();
-  }
-  add(range, success, fail) {
-    const name = `task_${this.tasks.length}`;
-    this.tasks.push({ name, range, success, fail });
-  }
-  addList(list) {
-    list.forEach((item) => {
-      this.add(item.range, item.success, item.fail);
-    });
-  }
-  run(val) {
-    this.tasks.forEach((task) => {
-      const { name, range, success, fail } = task;
-      if (val >= range[0] && val < range[1]) {
-        if (!this.statusMap.has(name)) {
-          this.statusMap.set(name, false);
-        }
-        if (this.statusMap.get(name) !== true) {
-          success && success(val);
-          this.statusMap.set(name, true);
-        }
-      } else {
-        if (!this.statusMap.has(name)) {
-          this.statusMap.set(name, true);
-        }
-        if (this.statusMap.get(name) !== false) {
-          fail && fail(val);
-          this.statusMap.set(name, false);
-        }
-      }
-    });
-  }
-  destroy() {
-    this.tasks = [];
-    this.statusMap.clear();
-  }
-};
-
-// src/Msg.js
-var Msg = class {
+// src/Tips.js
+var Tips = class {
   constructor() {
     this.id = "app-page-tips";
     this.container;
@@ -292,7 +253,7 @@ var Msg = class {
       document.head.appendChild(this.style);
     }
   }
-  show(content, style = "default", duration = 1.5) {
+  tips(content, style = "default", duration = 1.5) {
     if (!this.div) this.init();
     clearTimeout(this.timer);
     this.inner.setAttribute("class", `app-page-tips msg-${style}`);
@@ -307,7 +268,62 @@ var Msg = class {
     this.style && document.head.removeChild(this.style);
   }
 };
-var msg = new Msg();
+var msg;
+function useTips() {
+  return msg ? msg : new Tips();
+}
+function tips(text, type = "default", duration = 1.5) {
+  useTips().tips(text, type, duration);
+}
+
+// src/PageScroller.js
+function bodyOverflow(isTrue) {
+  document.body.setAttribute(
+    "style",
+    isTrue ? "overflow:hidden" : "overflow:auto"
+  );
+}
+function render(dataList) {
+  if (dataList.length > 0) {
+    bodyOverflow(true);
+  } else {
+    bodyOverflow(false);
+  }
+}
+var PageScroller = class {
+  constructor() {
+    this.allowList = [];
+  }
+  show(id) {
+    if (this.allowList.indexOf(id) > -1) {
+      return;
+    }
+    this.allowList.push(id);
+    render(this.allowList);
+  }
+  hide(id) {
+    let index = this.allowList.indexOf(id);
+    if (index == -1) return;
+    this.allowList.splice(index, 1);
+    render(this.allowList);
+  }
+  reset() {
+    this.allowList = [];
+    render(this.allowList);
+  }
+};
+var pageScroller;
+function getPageScroller() {
+  return pageScroller ? pageScroller : new PageScroller();
+}
+function usePageScroller() {
+  const id = Symbol();
+  return {
+    show: () => getPageScroller().show(id),
+    hide: () => getPageScroller().hide(id),
+    reset: () => getPageScroller().reset()
+  };
+}
 
 // src/Page.js
 var LIVE_MAP = {
@@ -384,10 +400,9 @@ var Page = class {
         }
       }
     );
+    this.pageScroller = usePageScroller();
     this.callback = new Callback();
-    this.rangeTask = new RangeTask();
     this.local = new LocalStore(localStoreName ? localStoreName : "app-page-store");
-    (0, vue_runtime_esm_bundler_exports.onUnmounted)(() => this?.destroy());
   }
   // ref对象的配置、获取和设置
   setRefs(refs) {
@@ -517,13 +532,11 @@ var Page = class {
     this.emit = null;
     this.proxy = null;
     this.$ = null;
-    this.local.free();
     this.local = null;
-    this.rangeTask.destroy();
-    this.rangeTask = null;
     this.callback.run("destroy");
     this.callback.destroy();
     this.callback = null;
+    this.pageScroller = null;
   }
   binds(options) {
     for (let key in options) {
@@ -544,7 +557,10 @@ var Page = class {
     }
   }
   tips(text, type = "default", duration = 1.5) {
-    msg.show(text, type, duration);
+    tips(text, type, duration);
+  }
+  scroll(status) {
+    status ? this.pageScroller.show() : this.pageScroller.hide();
   }
 };
 
@@ -566,13 +582,13 @@ function goToUrl(url) {
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
-    this?.msg && this.msg.showMsg("\u590D\u5236\u6210\u529F", "success");
+    tips("\u590D\u5236\u6210\u529F", "success");
   } catch (err) {
     let result = await navigator.permissions.query({ name: "write-on-clipboard" });
     if (result.state == "granted" || result.state == "prompt") {
-      this?.msg && this.msg.showMsg("\u6CA1\u6709\u6743\u9650", "fail");
+      tips("\u6CA1\u6709\u6743\u9650", "fail");
     } else {
-      this?.msg && this.msg.showMsg("\u590D\u5236\u5931\u8D25", "fail");
+      tips("\u590D\u5236\u5931\u8D25", "fail");
     }
   }
 }
@@ -788,8 +804,10 @@ export {
   Page,
   Tools_default as Tools,
   src_default as default,
-  msg,
   templateToComponment,
+  tips,
+  usePageScroller,
+  useTips,
   watchPanelEvent
 };
 /*! Bundled license information:
