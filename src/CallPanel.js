@@ -36,26 +36,39 @@ export class CallPanel {
 
 /**
  * 监听面板事件
- * @param {CallPanel} callback 面板显示和隐藏的回调
- * @param {Object} props 组件的props
+ * @param {CallPanel} props 面板显示和隐藏的回调
+ * @param {Object} callback 组件的props
  */
-export function watchPanelEvent (callback, props) {
-  if (!(callback && callback instanceof Callback)) {
-    throw new Error('callback must be an instance of Callback');
+export function watchPanelEvent (props, callback) {
+  function run(name, panelOption, panelCallback, panelConfig) {
+    if (!callback) {
+      return;
+    }
+
+    if (callback instanceof CallPanel) {
+      callback.run(name, panelOption, panelCallback, panelConfig);
+      return;
+    }
+
+    if (typeof callback === 'object' && name in callback) {
+      callback[name](panelOption, panelCallback, panelConfig);
+      return;
+    }
+
+    if (typeof callback === 'function') {
+      callback(panelOption, panelCallback, panelConfig);
+    }
   }
 
   return watch(
-    () => props.config.value.timestamp,
+    () => props?.config?.value?.timestamp,
     () => {
-      if (props.config.value.isShow) {
-        callback
-        && callback.run
-        && callback.run('show', props.option.value, props.callback, props.config.value);
-      } else {
-        callback
-        && callback.run
-        && callback.run('hide', props.option.value, props.callback, props.config.value);
-      }
+      run(
+        props?.config?.value?.isShow ? 'show' : 'hide',
+        props?.option?.value,
+        props?.callback,
+        props?.config?.value
+      );
     },
     { deep: true },
   );

@@ -13,6 +13,11 @@ export class LocalStore {
     this.name = name || 'LocalStore';
   }
 
+  setName(name) {
+    this.name = name;
+    return this;
+  }
+
   get(key, default_val) {
     let data = {};
     try {

@@ -748,18 +748,32 @@ var CallPanel = class {
     this.config.value = null;
   }
 };
-function watchPanelEvent(callback, props) {
-  if (!(callback && callback instanceof Callback)) {
-    throw new Error("callback must be an instance of Callback");
+function watchPanelEvent(props, callback) {
+  function run(name, panelOption, panelCallback, panelConfig) {
+    if (!callback) {
+      return;
+    }
+    if (callback instanceof CallPanel) {
+      callback.run(name, panelOption, panelCallback, panelConfig);
+      return;
+    }
+    if (typeof callback === "object" && name in callback) {
+      callback[name](panelOption, panelCallback, panelConfig);
+      return;
+    }
+    if (typeof callback === "function") {
+      callback(panelOption, panelCallback, panelConfig);
+    }
   }
   return (0, vue_runtime_esm_bundler_exports.watch)(
-    () => props.config.value.timestamp,
+    () => props?.config?.value?.timestamp,
     () => {
-      if (props.config.value.isShow) {
-        callback && callback.run && callback.run("show", props.option.value, props.callback, props.config.value);
-      } else {
-        callback && callback.run && callback.run("hide", props.option.value, props.callback, props.config.value);
-      }
+      run(
+        props?.config?.value?.isShow ? "show" : "hide",
+        props?.option?.value,
+        props?.callback,
+        props?.config?.value
+      );
     },
     { deep: true }
   );

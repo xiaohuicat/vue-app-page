@@ -8,9 +8,11 @@ npm install app-page
 import { Page } from 'app-page'
 // 给你的应用创建一个页面管理对象
 const page = new Page();
-// 解构获取代理上下文，$是数据、函数等的代理对象，访问ref或computed变量可以自动解包。
-// 你可以通过$.name读取值，$.name = 100设置值。
-// 如果你想要原始的ref，$['[getRef]name']读取，$['[getRef]name'] = ref(100)设置，但不建议设置，在VUE模板中会失去响应性。
+/**
+ * 解构获取代理上下文，$是数据、函数等的代理对象，访问ref或computed变量可以自动解包。
+ * 你可以通过$.name读取值，$.name = 100设置值
+ * 如果你想要原始的ref，$['[getRef]name']读取，$['[getRef]name'] = ref(100)设置，但不建议设置，在VUE模板中会失去响应性。
+ */
 const { $ } = page;
 ```
 
@@ -49,8 +51,8 @@ import { Page } from 'app-page';
 const page = new Page;
 const { $ } = page;
 page.setRefs({
-  num: 0,                   // 响应式数据ref
-  price: 100,               // 响应式数据ref
+  num: 0,                             // 响应式数据ref
+  price: 100,                         // 响应式数据ref
   total: () => ($.num*$.price)+'元',  // 计算属性computed
 });
 page.setFuns({clear: () => { $.num = 0; }});
@@ -65,46 +67,71 @@ page.setFuns({clear: () => { $.num = 0; }});
 ```
 
 # 数据加载
+1、在page中直接使用，page.local
 ```javascript
+// 获取本地数据page001中的name
+page.local.setName('page001').get('name');
+```
+2、从app-page引入，实例化后使用。
+```javascript
+import { LocalStore } from 'app-page';
+// 设置本地数据，id = 'page001'
+const store = new LocalStore('page001');
+// 更换数据名称，id = 'userInfo'
+store.setName('userInfo');
 // 获取本地数据
-page.local.get(key);
+store.get(key);
 // 设置本地数据
-page.local.set(key, value);
-// 报错本地数据，和set功能一样
-page.local.save(key, value);
+store.set(key, value);
+// 保存本地数据，和set功能一样
+store.save(key, value);
 // 删除本地数据
-page.local.delete(key);
+store.delete(key);
 // 清除数据
-page.local.clear();
+store.clear();
 // 查看数据大小
-page.local.size();
+store.size();
 ```
 
 # 回调使用
+1、在page中直接使用，page.callback
+2、在CallPanel中直接使用，panel.callback
+3、从app-page引入，实例化后使用。
 ```javascript
+import { Callback } from 'app-page';
+const callback = new Callback({'input': (text) => {}});
 // 添加回调
-page.callback.add('login', func);
+callback.add('login', func);
 // 覆盖回调
-page.callback.set('login', func);
+callback.set('login', func);
 // 移除回调
-page.callback.remove('login');
+callback.remove('login');
 // 获取回调，返回一个函数列表
-page.callback.get('login');
+callback.get('login');
 // 执行回调，没有挂载函数也可以安全执行
-page.callback.run('login', params);
+callback.run('login', params);
 // 清空回调
-page.callback.destroy();
+callback.destroy();
 ```
 
 # 消息提示
+1、在page中直接使用，page.tips
+2、从app-page引入msg，msg.tips。
 ```javascript
-// page.tips(content, type, duration);可输入三个参数
-// content: 提示内容
-// type: 类型'default'、'success'、'fail'、'warning'
-// duration: 显示时间秒，默认1.5s
+import { msg } from 'app-page';
+/**
+ * tips(content, type, duration) 可输入三个参数
+ * content: 提示内容
+ * type: 类型'default'、'success'、'fail'、'warning'
+ * duration: 显示时间秒，默认1.5s
+ * */
 page.tips('默认信息');
 page.tips('成功信息', 'success');
 page.tips('失败信息', 'fail', 3);
+
+msg.tips('默认信息');
+msg.tips('成功信息', 'success');
+msg.tips('失败信息', 'fail', 3);
 ```
 
 # 显示隐藏面板
@@ -112,15 +139,40 @@ page.tips('失败信息', 'fail', 3);
 ```javascript
 import { CallPanel } from 'app-page';
 const panel = new CallPanel();
-panel.show({title: '标题', content: '内容'});
-panel.callback.add('confirm', ()=>page.tips('点击了确定'));
+panel.callback.add('confirm', (param) => page.tips(param));
+// 父组件显示弹窗面板
+function showPanel() {
+  panel.show({
+    title: '标题',
+    content: '内容',
+  });
+}
 ```
+
 子组件监听事件
 ```javascript
-import { watchPanelEvent, Callback } from 'app-page';
-const callback = new Callback();
-const dataObj = {}
-callback.add('show', (option, callback, config)=>{});
-callback.add('hide', (option, callback, config)=>{});
-watchPanelEvent(callback, page.props.panel);
+import { watchPanelEvent } from 'app-page';
+page.setRefs({
+  isShow: false,
+  title: '',
+  content: '',
+});
+let fatherCallback;
+// 父组件要求显示
+function show(option, callback, config) {
+  $.isShow = true;
+  $.title = option?.title;
+  $.content = option?.content;
+  fatherCallback = callback;
+}
+// 父组件要求隐藏
+function hide(option, callback, config) {
+  $.isShow = false;
+  fatherCallback = null;
+}
+watchPanelEvent(page.props.panel, {show, hide});
+
+function confirm() {
+  fatherCallback && fatherCallback.run('confirm', '点击了确定');
+}
 ```
