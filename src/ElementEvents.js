@@ -61,7 +61,6 @@ export class ElementEvents {
       if (!(name in this.register)) return;
 
       if ('throttle' in this.register[name]) {
-        // debounceMap如果有记录，比较时间，时间不足直接退出
         if (this.debounceMap.has(name)) {
           if (Date.now() - this.debounceMap.get(name) < this.register[name].throttle) {
             return;

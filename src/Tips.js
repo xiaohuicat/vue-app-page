@@ -108,7 +108,4 @@ function tips(text, type = 'default', duration = 1.5) {
   useTips().tips(text, type, duration);
 }
 
-export {
-  useTips,
-  tips,
-}
+export { useTips, tips };

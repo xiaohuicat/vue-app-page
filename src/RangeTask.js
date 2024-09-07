@@ -5,7 +5,7 @@ export class RangeTask {
   }
 
   add(range, success, fail) {
-    if (Array.isArray(range)) {
+    if (Array.isArray(range) && success === undefined && fail === undefined) {
       range.forEach((item) => {
         this.add(item.range, item.success, item.fail);
       });

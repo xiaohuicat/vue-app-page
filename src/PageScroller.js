@@ -1,8 +1,5 @@
 function bodyOverflow(isTrue) {
-  document.body.setAttribute(
-    'style',
-    isTrue ? 'overflow:hidden' : 'overflow:auto',
-  );
+  document.body.setAttribute('style', isTrue ? 'overflow:hidden' : 'overflow:auto');
 }
 
 function render(dataList) {
@@ -26,7 +23,7 @@ class PageScroller {
   }
   hide(id) {
     let index = this.allowList.indexOf(id);
-    if (index == -1) return;
+    if (index === -1) return;
     this.allowList.splice(index, 1);
     render(this.allowList);
   }
@@ -38,18 +35,20 @@ class PageScroller {
 
 let pageScroller;
 function getPageScroller() {
-  return pageScroller ? pageScroller : new PageScroller();
+  if (!pageScroller) {
+    pageScroller = new PageScroller();
+  }
+  return pageScroller;
 }
 
 function usePageScroller() {
   const id = Symbol();
+  const scroller = getPageScroller();
   return {
-    show: () => getPageScroller().show(id),
-    hide: () => getPageScroller().hide(id),
-    reset: () => getPageScroller().reset(),
-  }
+    show: () => scroller.show(id),
+    hide: () => scroller.hide(id),
+    reset: () => scroller.reset()
+  };
 }
 
-export {
-  usePageScroller,
-}
+export { usePageScroller };
