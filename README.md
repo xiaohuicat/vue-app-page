@@ -94,3 +94,33 @@ page.callback.get('login');
 page.callback.run('login', params);
 // 清空回调
 page.callback.destroy();
+```
+
+# 消息提示
+```javascript
+// page.tips(content, type, duration);可输入三个参数
+// content: 提示内容
+// type: 类型'default'、'success'、'fail'、'warning'
+// duration: 显示时间秒，默认1.5s
+page.tips('默认信息');
+page.tips('成功信息', 'success');
+page.tips('失败信息', 'fail', 3);
+```
+
+# 显示隐藏面板
+父组件创建一个面板管理对象
+```javascript
+import { CallPanel } from 'app-page';
+const panel = new CallPanel();
+panel.show({title: '标题', content: '内容'});
+panel.callback.add('confirm', ()=>page.tips('点击了确定'));
+```
+子组件监听事件
+```javascript
+import { watchPanelEvent, Callback } from 'app-page';
+const callback = new Callback();
+const dataObj = {}
+callback.add('show', (option, callback, config)=>{});
+callback.add('hide', (option, callback, config)=>{});
+watchPanelEvent(callback, page.props.panel);
+```

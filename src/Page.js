@@ -15,6 +15,7 @@ import {
 } from 'vue';
 import { LocalStore } from './LocalStore';
 import { RangeTask } from './RangeTask';
+import { msg } from './Msg';
 
 const LIVE_MAP = {
   onMounted,
@@ -108,10 +109,12 @@ export class Page {
     // vue卸载时自动销毁
     onUnmounted(() => this?.destroy());
   }
+
   // ref对象的配置、获取和设置
   setRefs(refs) {
     this.instance['proxy'] = createRefs(this.$, refs);
   }
+
   setRef(key, value) {
     let [head, ...others] = key.split('.');
     let ref_value = {};
@@ -123,9 +126,11 @@ export class Page {
       this.instance['proxy'] = createRefs(this.$, { [key]: value });
     }
   }
+
   getRef(key) {
     return this.$['[getRef]' + key];
   }
+
   set(key, value) {
     let [head, ...others] = key.split('.');
     let ref_value = {};
@@ -137,18 +142,22 @@ export class Page {
       this.instance['proxy'] = createRefs(this.$, { [key]: value });
     }
   }
+
   get(key) {
     return this.$[key];
   }
   setFuns(funs) {
     this.instance['proxy'] = createFuns(this.$, funs);
   }
+
   setFun(key, value) {
     this.instance['proxy'] = createFuns(this.$, { [key]: value });
   }
+
   getFun(key) {
     return this.$[key];
   }
+
   // watch数据对象
   watch(ref_or_fun, callback) {
     watch(ref_or_fun, (newValue, oldValue) => {
@@ -159,6 +168,7 @@ export class Page {
       }
     });
   }
+
   // watch数据对象
   watchRef(name, callback) {
     let [head, ...others] = name.split('.');
@@ -186,6 +196,7 @@ export class Page {
       }
     );
   }
+
   // watch数据对象
   watchProps(name, callback) {
     if (!(this.props && name in this.props)) {
@@ -203,6 +214,7 @@ export class Page {
       }
     );
   }
+
   // 生命周期的函数的配置和设置
   setLives(LIVE) {
     if (isObject(LIVE)) {
@@ -220,6 +232,7 @@ export class Page {
       }
     }
   }
+
   setLive(name, func) {
     if (typeof name === 'string' && typeof func === 'function') {
       if (name in LIVE_MAP) {
@@ -233,6 +246,7 @@ export class Page {
       }
     }
   }
+
   destroy() {
     this.instance = null;
     this.props = null;
@@ -247,6 +261,7 @@ export class Page {
     this.callback.destroy();
     this.callback = null;
   }
+
   binds(options) {
     for (let key in options) {
       const val = options[key];
@@ -257,6 +272,7 @@ export class Page {
       }
     }
   }
+
   bind(key, val) {
     if (typeof key !== 'string') return;
     if (typeof val === 'function') {
@@ -264,5 +280,9 @@ export class Page {
     } else {
       this[key] = val;
     }
+  }
+
+  tips(text, type = 'default', duration = 1.5) {
+    msg.show(text, type, duration);
   }
 }

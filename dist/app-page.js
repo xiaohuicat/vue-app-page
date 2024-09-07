@@ -215,6 +215,100 @@ var RangeTask = class {
   }
 };
 
+// src/Msg.js
+var Msg = class {
+  constructor() {
+    this.id = "app-page-tips";
+    this.container;
+    this.inner;
+    this.style;
+  }
+  init() {
+    if (!this.container) {
+      this.container = document.createElement("div");
+      this.container.setAttribute("id", this.id + "-container");
+      document.body.appendChild(this.container);
+      this.inner = document.createElement("div");
+      this.inner.setAttribute("class", "app-page-tips");
+      this.container.appendChild(this.inner);
+    }
+    if (!this.style) {
+      this.style = document.createElement("style");
+      this.style.setAttribute("type", "text/css");
+      this.style.setAttribute(this.id + "-style", "");
+      this.style.innerHTML = `
+#app-page-tips-container {
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000000001;
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+#app-page-tips-container .app-page-tips {
+  position: relative;
+  max-width: 660px;
+  width: auto;
+  height: auto;
+  display: block;
+  padding: 10px 12px;
+  margin: 15px;
+  border-radius: 8px;
+  color: #f1f1f1;
+  word-break: break-all;
+  background-color: #4d4d4d;
+  transition: all .3s ease;
+}
+
+#app-page-tips-container .msg-default {
+  color: #f1f1f1;
+  background-color: #4d4d4d;
+}
+
+#app-page-tips-container .msg-success {
+  color: #fff;
+  background-color: #28be28;
+}
+
+#app-page-tips-container .msg-fail {
+  color: #fff;
+  background-color: #e64035;
+}
+
+#app-page-tips-container .msg-warning {
+  color: #fff;
+  background-color: #eaa640;
+}
+
+#app-page-tips-container .msg-hide {
+  display: none;
+}
+`;
+      document.head.appendChild(this.style);
+    }
+  }
+  show(content, style = "default", duration = 1.5) {
+    if (!this.div) this.init();
+    clearTimeout(this.timer);
+    this.inner.setAttribute("class", `app-page-tips msg-${style}`);
+    this.inner.innerHTML = content;
+    this.timer = setTimeout(() => {
+      this.inner.setAttribute("class", "app-page-tips msg-hide");
+    }, duration * 1e3);
+  }
+  destory() {
+    this.inner && document.body.removeChild(this.inner);
+    this.container && document.body.removeChild(this.container);
+    this.style && document.head.removeChild(this.style);
+  }
+};
+var msg = new Msg();
+
 // src/Page.js
 var LIVE_MAP = {
   onMounted: vue_runtime_esm_bundler_exports.onMounted,
@@ -449,6 +543,9 @@ var Page = class {
       this[key] = val;
     }
   }
+  tips(text, type = "default", duration = 1.5) {
+    msg.show(text, type, duration);
+  }
 };
 
 // src/Tools.js
@@ -620,15 +717,66 @@ function getComponentByInstruction(instruction) {
   return [componentName, param];
 }
 
+// src/CallPanel.js
+var CallPanel = class {
+  constructor(id) {
+    this.callback = new Callback();
+    this.option = (0, vue_runtime_esm_bundler_exports.ref)({});
+    this.config = (0, vue_runtime_esm_bundler_exports.ref)({
+      timestamp: Date.now(),
+      isShow: false,
+      id
+    });
+  }
+  show(option) {
+    this.option.value = option;
+    this.config.value = {
+      timestamp: Date.now(),
+      isShow: true
+    };
+  }
+  hide() {
+    this.config.value = {
+      timestamp: Date.now(),
+      isShow: false
+    };
+  }
+  destroy() {
+    this.callback.destroy();
+    this.callback = null;
+    this.option.value = null;
+    this.config.value = null;
+  }
+};
+function watchPanelEvent(callback, props) {
+  if (!(callback && callback instanceof Callback)) {
+    throw new Error("callback must be an instance of Callback");
+  }
+  return (0, vue_runtime_esm_bundler_exports.watch)(
+    () => props.config.value.timestamp,
+    () => {
+      if (props.config.value.isShow) {
+        callback && callback.run && callback.run("show", props.option.value, props.callback, props.config.value);
+      } else {
+        callback && callback.run && callback.run("hide", props.option.value, props.callback, props.config.value);
+      }
+    },
+    { deep: true }
+  );
+}
+
 // src/index.js
 var src_default = Page;
 export {
+  CallPanel,
   Callback,
   LocalStore,
   Page,
   Tools_default as Tools,
   src_default as default,
-  templateToComponment
+  msg,
+  templateToComponment,
+  watchPanelEvent
 };
 /*! Bundled license information:
 
