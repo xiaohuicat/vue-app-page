@@ -20,7 +20,7 @@ var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "defau
 var Callback = class {
   constructor(callbackDict = {}) {
     this.callbackDict = {};
-    if (!callbackDict && typeof callbackDict === "object") {
+    if (callbackDict && typeof callbackDict === "object") {
       Object.keys(callbackDict).forEach((each) => this.set(each, callbackDict[each]));
     }
   }
