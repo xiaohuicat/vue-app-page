@@ -1071,7 +1071,7 @@ function watchPanel(panel, callback) {
     }
   }
   const replyPanel = new ReplyPanel(panel);
-  watch(
+  (0, vue_runtime_esm_bundler_exports.watch)(
     () => panel?.timestamp?.value,
     () => {
       run(
