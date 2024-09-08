@@ -210,49 +210,39 @@ scroll.stop();
 // 允许滚动
 scroll.run();
 ```
-# 显示隐藏面板
 
-父组件创建一个面板管理对象
+# 父子传呼机
 
+父组件创建手机
 ```javascript
-import { CallPanel } from 'app-page';
-const panel = new CallPanel();
-panel.callback.add('confirm', (param) => page.tips(param));
-// 父组件显示弹窗面板
-function showPanel() {
-  panel.show({
-    title: '标题',
-    content: '内容',
-  });
-}
+import { Phone } from 'app-page';
+// 把允许儿子可以提的要求放进手机
+const phone = new Phone({
+  confirm: (param) => page.tips(param),
+});
+// 告诉儿子更新数据
+phone.call('update', {
+  title: '标题',
+  content: '内容',
+});
 ```
 
-子组件监听事件
-
+子组件监听手机
 ```javascript
-import { watchPanelEvent } from 'app-page';
+import { watchPhone } from 'app-page';
 page.setRefs({
-  isShow: false,
   title: '',
   content: '',
 });
-let fatherCallback;
-// 父组件要求显示
-function show(option, callback, config) {
-  $.isShow = true;
+// 父亲打电话要求更新的时候执行
+function update(option, callback, config) {
   $.title = option?.title;
   $.content = option?.content;
-  fatherCallback = callback;
 }
-// 父组件要求隐藏
-function hide(option, callback, config) {
-  $.isShow = false;
-  fatherCallback = null;
-}
-// 启用面板事件监听
-watchPanelEvent(page.props.panel, {show, hide});
-
+// 儿子要时刻盯着手机
+const phone = watchPhone(page.props.phone, {update});
+// 告诉父亲确认
 function confirm() {
-  fatherCallback && fatherCallback.run('confirm', '点击了确定');
+  phone.call('confirm', '爸，有人打你儿子了');
 }
 ```

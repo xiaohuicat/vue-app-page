@@ -1,75 +1,69 @@
-import { Callback } from './Callback.js';
-import { ref, watch } from 'vue';
+import { Phone } from './Phone';
 
-export class CallPanel {
-  constructor(id) {
-    this.callback = new Callback();
-    this.option = ref({});
-    this.config = ref({
-      timestamp: Date.now(),
-      isShow: false,
-      id: id
-    });
+export class CallPanel extends Phone {
+  constructor(callbackDict) {
+    super(callbackDict);
   }
   show(option) {
-    this.option.value = option;
-    this.config.value = {
-      timestamp: Date.now(),
-      isShow: true
-    };
+    this.args = option;
+    this.timestamp.value = Date.now();
   }
 
-  hide() {
-    this.config.value = {
-      timestamp: Date.now(),
-      isShow: false
-    };
+  hide(option) {
+    this.args = option;
+    this.timestamp.value = Date.now();
+  }
+}
+
+class ReplyPanel {
+  constructor(panel) {
+    this.panel = panel instanceof CallPanel ? panel : null;
   }
 
-  destroy() {
-    this.callback.destroy();
-    this.callback = null;
-    this.option.value = null;
-    this.config.value = null;
+  call(name, ...args) {
+    if (!this.panel) {
+      return false;
+    }
+
+    this.panel.callback.run(name, ...args);
+    return true;
   }
 }
 
 /**
- * 监听面板事件
- * @param {CallPanel} props 面板显示和隐藏的回调
- * @param {Object} callback 组件的props
+ * 监听面板
+ * @param {CallPanel} panel props中传入的父组件panel对象
+ * @param {Callback | Object} callback 子组件应答函数对象
+ * @returns {ReplyPanel} 回复电话对象
  */
-export function watchPanelEvent(props, callback) {
-  function run(name, panelOption, panelCallback, panelConfig) {
+export function watchPanel(panel, callback) {
+  function run(name, replyPanel, args) {
     if (!callback) {
       return;
     }
 
-    if (callback instanceof CallPanel) {
-      callback.run(name, panelOption, panelCallback, panelConfig);
+    if (callback instanceof Callback) {
+      callback.run(name, replyPanel, ...args);
       return;
     }
 
     if (typeof callback === 'object' && name in callback) {
-      callback[name](panelOption, panelCallback, panelConfig);
+      callback[name](replyPanel, ...args);
       return;
     }
 
     if (typeof callback === 'function') {
-      callback(panelOption, panelCallback, panelConfig);
+      callback(replyPanel, ...args);
     }
   }
-
-  return watch(
-    () => props?.config?.value?.timestamp,
-    () => {
-      run(
-        props?.config?.value?.isShow ? 'show' : 'hide',
-        props?.option?.value,
-        props?.callback,
-        props?.config?.value
-      );
-    },
-    { deep: true }
+  const replyPanel = new ReplyPanel(panel);
+  watch(
+    () => panel?.timestamp?.value,
+    () => {run(
+      panel?.name,
+      replyPanel,
+      phone?.args
+    )}
   );
+  return replyPanel;
 }

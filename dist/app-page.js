@@ -17,7 +17,7 @@ var __copyProps = (to, from, except, desc) => {
 var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
 
 // src/Callback.js
-var Callback = class {
+var Callback2 = class {
   constructor(callbackDict = {}) {
     this.callbackDict = {};
     if (callbackDict && typeof callbackDict === "object") {
@@ -488,7 +488,7 @@ var Page = class {
       }
     );
     this.pageScroller = useScroll();
-    this.callback = new Callback();
+    this.callback = new Callback2();
     this.local = new LocalStore(localStoreName ? localStoreName : "app-page-store");
     this.store = useStore(localStoreName ? localStoreName : "app-page-store");
   }
@@ -837,68 +837,6 @@ function getComponentByInstruction(instruction) {
   return [componentName, param];
 }
 
-// src/CallPanel.js
-var CallPanel = class {
-  constructor(id) {
-    this.callback = new Callback();
-    this.option = (0, vue_runtime_esm_bundler_exports.ref)({});
-    this.config = (0, vue_runtime_esm_bundler_exports.ref)({
-      timestamp: Date.now(),
-      isShow: false,
-      id
-    });
-  }
-  show(option) {
-    this.option.value = option;
-    this.config.value = {
-      timestamp: Date.now(),
-      isShow: true
-    };
-  }
-  hide() {
-    this.config.value = {
-      timestamp: Date.now(),
-      isShow: false
-    };
-  }
-  destroy() {
-    this.callback.destroy();
-    this.callback = null;
-    this.option.value = null;
-    this.config.value = null;
-  }
-};
-function watchPanelEvent(props, callback) {
-  function run(name, panelOption, panelCallback, panelConfig) {
-    if (!callback) {
-      return;
-    }
-    if (callback instanceof CallPanel) {
-      callback.run(name, panelOption, panelCallback, panelConfig);
-      return;
-    }
-    if (typeof callback === "object" && name in callback) {
-      callback[name](panelOption, panelCallback, panelConfig);
-      return;
-    }
-    if (typeof callback === "function") {
-      callback(panelOption, panelCallback, panelConfig);
-    }
-  }
-  return (0, vue_runtime_esm_bundler_exports.watch)(
-    () => props?.config?.value?.timestamp,
-    () => {
-      run(
-        props?.config?.value?.isShow ? "show" : "hide",
-        props?.option?.value,
-        props?.callback,
-        props?.config?.value
-      );
-    },
-    { deep: true }
-  );
-}
-
 // src/RangeTask.js
 var RangeTask = class {
   constructor() {
@@ -968,7 +906,7 @@ var ElementEvents = class {
   constructor(element, register) {
     this.element = getElement(element);
     this.register = register;
-    this.callback = new Callback();
+    this.callback = new Callback2();
     this.map = /* @__PURE__ */ new Map();
     this.debounceMap = /* @__PURE__ */ new Map();
     this.init();
@@ -1026,14 +964,135 @@ var ElementEvents = class {
   }
 };
 
+// src/Phone.js
+var Phone = class {
+  constructor(callbackDict) {
+    this.args;
+    this.name;
+    this.callback = new Callback2(callbackDict);
+    this.timestamp = (0, vue_runtime_esm_bundler_exports.ref)(Date.now());
+  }
+  call(name, args) {
+    this.name = name;
+    this.args = args;
+    this.timestamp.value = Date.now();
+  }
+  destroy() {
+    this.callback.destroy();
+    this.callback = null;
+    this.args = null;
+    this.timestamp.value = null;
+  }
+};
+var ReplyPhone = class {
+  constructor(phone2) {
+    this.phone = phone2 instanceof Phone ? phone2 : null;
+  }
+  call(name, ...args) {
+    if (!this.phone) {
+      return false;
+    }
+    this.phone.callback.run(name, ...args);
+    return true;
+  }
+};
+function watchPhone(phone2, callback) {
+  function run(name, replyPhone2, args) {
+    if (!callback) {
+      return;
+    }
+    if (callback instanceof Callback2) {
+      callback.run(name, replyPhone2, ...args);
+      return;
+    }
+    if (typeof callback === "object" && name in callback) {
+      callback[name](replyPhone2, ...args);
+      return;
+    }
+    if (typeof callback === "function") {
+      callback(replyPhone2, ...args);
+    }
+  }
+  const replyPhone = new ReplyPhone(phone2);
+  (0, vue_runtime_esm_bundler_exports.watch)(
+    () => phone2?.timestamp?.value,
+    () => {
+      run(
+        phone2?.name,
+        replyPhone,
+        phone2?.args
+      );
+    }
+  );
+  return replyPhone;
+}
+
+// src/CallPanel.js
+var CallPanel = class extends Phone {
+  constructor(callbackDict) {
+    super(callbackDict);
+  }
+  show(option) {
+    this.args = option;
+    this.timestamp.value = Date.now();
+  }
+  hide(option) {
+    this.args = option;
+    this.timestamp.value = Date.now();
+  }
+};
+var ReplyPanel = class {
+  constructor(panel) {
+    this.panel = panel instanceof CallPanel ? panel : null;
+  }
+  call(name, ...args) {
+    if (!this.panel) {
+      return false;
+    }
+    this.panel.callback.run(name, ...args);
+    return true;
+  }
+};
+function watchPanel(panel, callback) {
+  function run(name, replyPanel2, args) {
+    if (!callback) {
+      return;
+    }
+    if (callback instanceof Callback) {
+      callback.run(name, replyPanel2, ...args);
+      return;
+    }
+    if (typeof callback === "object" && name in callback) {
+      callback[name](replyPanel2, ...args);
+      return;
+    }
+    if (typeof callback === "function") {
+      callback(replyPanel2, ...args);
+    }
+  }
+  const replyPanel = new ReplyPanel(panel);
+  watch(
+    () => panel?.timestamp?.value,
+    () => {
+      run(
+        panel?.name,
+        replyPanel,
+        phone?.args
+      );
+    }
+  );
+  return replyPanel;
+}
+
 // src/index.js
 var src_default = Page;
 export {
   CallPanel,
-  Callback,
+  Callback2 as Callback,
   ElementEvents,
   LocalStore,
   Page,
+  Phone,
   RangeTask,
   Tools_default as Tools,
   clearStore,
@@ -1044,7 +1103,8 @@ export {
   useScroll,
   useStore,
   useTips,
-  watchPanelEvent
+  watchPanel,
+  watchPhone
 };
 /*! Bundled license information:
 
