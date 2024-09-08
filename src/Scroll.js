@@ -10,18 +10,18 @@ function render(dataList) {
   }
 }
 
-class PageScroller {
+class Scroller {
   constructor() {
     this.allowList = [];
   }
-  show(id) {
+  stop(id) {
     if (this.allowList.indexOf(id) > -1) {
       return;
     }
     this.allowList.push(id);
     render(this.allowList);
   }
-  hide(id) {
+  run(id) {
     let index = this.allowList.indexOf(id);
     if (index === -1) return;
     this.allowList.splice(index, 1);
@@ -33,22 +33,23 @@ class PageScroller {
   }
 }
 
-let pageScroller;
-function getPageScroller() {
-  if (!pageScroller) {
-    pageScroller = new PageScroller();
+let scroller;
+function getScroller() {
+  if (!scroller) {
+    scroller = new Scroller();
   }
-  return pageScroller;
+
+  return scroller;
 }
 
-function usePageScroller() {
+function useScroll() {
   const id = Symbol();
-  const scroller = getPageScroller();
+  const myScroller = getScroller();
   return {
-    show: () => scroller.show(id),
-    hide: () => scroller.hide(id),
-    reset: () => scroller.reset()
+    stop: () => myScroller.stop(id),
+    run: () => myScroller.run(id),
+    reset: () => myScroller.reset(),
   };
 }
 
-export { usePageScroller };
+export { useScroll };

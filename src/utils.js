@@ -47,4 +47,12 @@ function setObjectProperty(obj, key, value) {
   return obj;
 }
 
-export { isObject, getObjectProperty, setObjectProperty };
+/**
+ * 合法字符串
+ * @param {*} string
+ */
+function verifiedString(string) {
+  return typeof string === 'string' && string.trim() !== '';
+}
+
+export { isObject, getObjectProperty, setObjectProperty, verifiedString };

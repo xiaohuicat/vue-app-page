@@ -1,10 +1,4 @@
-/**
- * 通过校验的字符串
- * @param {*} string
- */
-function verifiedString(string) {
-  return typeof string === 'string' && string.trim() !== '';
-}
+import { verifiedString } from "./utils";
 
 // 本地数据存储
 export class LocalStore {

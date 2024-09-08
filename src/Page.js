@@ -14,8 +14,9 @@ import {
   computed
 } from 'vue';
 import { LocalStore } from './LocalStore';
-import { tips } from './Tips';
-import { usePageScroller } from './PageScroller';
+import { useTips } from './Tips';
+import { useScroll } from './Scroll';
+import { createStore, useStore } from './Store';
 
 const LIVE_MAP = {
   onMounted,
@@ -102,9 +103,10 @@ export class Page {
       }
     );
 
-    this.pageScroller = usePageScroller();
+    this.pageScroller = useScroll();
     this.callback = new Callback();
     this.local = new LocalStore(localStoreName ? localStoreName : 'app-page-store');
+    this.store = createStore(localStoreName ? localStoreName : 'app-page-store');
   }
 
   // ref对象的配置、获取和设置
@@ -255,6 +257,7 @@ export class Page {
     this.callback.destroy();
     this.callback = null;
     this.pageScroller = null;
+    this.store = null;
   }
 
   binds(options) {
@@ -278,10 +281,28 @@ export class Page {
   }
 
   tips(text, type = 'default', duration = 1.5) {
-    tips(text, type, duration);
+    useTips().tips(text, type, duration);
+  }
+
+  useStore(name) {
+    this.store = useStore(name);
+    return this.store;
+  }
+
+  createStore(name, events) {
+    this.store = createStore(name, events);
+    return this.store;
   }
 
   scroll(status) {
-    status ? this.pageScroller.show() : this.pageScroller.hide();
+    if (typeof status === 'boolean') {
+      status ? this.pageScroller.run() : this.pageScroller.stop();
+      return;
+    }
+
+    if (typeof status === 'string' && ['stop', 'run'].indexOf(status) > -1) {
+      status === 'stop' ? this.pageScroller.stop() : this.pageScroller.run();
+      return;
+    }
   }
 }

@@ -74,6 +74,17 @@ var Callback = class {
 function isObject(obj) {
   return obj !== null && typeof obj === "object" && !Array.isArray(obj);
 }
+function getObjectProperty(obj, key, default_value) {
+  const keys = key.split(".");
+  let current = obj;
+  for (let i = 0; i < keys.length; i++) {
+    if (current[keys[i]] === void 0) {
+      return default_value;
+    }
+    current = current[keys[i]];
+  }
+  return current;
+}
 function setObjectProperty(obj, key, value) {
   const keys = key.split(".");
   let current = obj;
@@ -95,6 +106,9 @@ function setObjectProperty(obj, key, value) {
   const finalKeyPart = keys[keys.length - 1];
   current[finalKeyPart] = value;
   return obj;
+}
+function verifiedString(string) {
+  return typeof string === "string" && string.trim() !== "";
 }
 
 // node_modules/.store/vue@3.4.38/node_modules/vue/dist/vue.runtime.esm-bundler.js
@@ -122,9 +136,6 @@ var compile = () => {
 };
 
 // src/LocalStore.js
-function verifiedString(string) {
-  return typeof string === "string" && string.trim() !== "";
-}
 var LocalStore = class {
   constructor(name) {
     this.name = name || "LocalStore";
@@ -177,28 +188,7 @@ var LocalStore = class {
 };
 
 // src/Tips.js
-var Tips = class {
-  constructor() {
-    this.id = "app-page-tips";
-    this.container;
-    this.inner;
-    this.style;
-  }
-  init() {
-    if (!this.container) {
-      this.container = document.createElement("div");
-      this.container.setAttribute("id", this.id + "-container");
-      document.body.appendChild(this.container);
-      this.inner = document.createElement("div");
-      this.inner.setAttribute("class", "app-page-tips");
-      this.container.appendChild(this.inner);
-    }
-    if (!this.style) {
-      this.style = document.createElement("style");
-      this.style.setAttribute("type", "text/css");
-      this.style.setAttribute(this.id + "-style", "");
-      this.style.innerHTML = `
-#app-page-tips-container {
+var STYLE = `#app-page-tips-container {
   width: 100vw;
   height: 100vh;
   justify-content: center;
@@ -250,6 +240,27 @@ var Tips = class {
   display: none;
 }
 `;
+var Tips = class {
+  constructor() {
+    this.id = "app-page-tips";
+    this.container;
+    this.inner;
+    this.style;
+  }
+  init() {
+    if (!this.container) {
+      this.container = document.createElement("div");
+      this.container.setAttribute("id", this.id + "-container");
+      document.body.appendChild(this.container);
+      this.inner = document.createElement("div");
+      this.inner.setAttribute("class", "app-page-tips");
+      this.container.appendChild(this.inner);
+    }
+    if (!this.style) {
+      this.style = document.createElement("style");
+      this.style.setAttribute("type", "text/css");
+      this.style.setAttribute(this.id + "-style", "");
+      this.style.innerHTML = STYLE;
       document.head.appendChild(this.style);
     }
   }
@@ -263,6 +274,7 @@ var Tips = class {
     }, duration * 1e3);
   }
   destory() {
+    this.id == null;
     this.inner && document.body.removeChild(this.inner);
     this.container && document.body.removeChild(this.container);
     this.style && document.head.removeChild(this.style);
@@ -270,18 +282,18 @@ var Tips = class {
 };
 var msg;
 function useTips() {
-  return msg ? msg : new Tips();
+  if (!msg || msg.id === null) {
+    msg = new Tips();
+  }
+  return msg;
 }
 function tips(text, type = "default", duration = 1.5) {
   useTips().tips(text, type, duration);
 }
 
-// src/PageScroller.js
+// src/Scroll.js
 function bodyOverflow(isTrue) {
-  document.body.setAttribute(
-    "style",
-    isTrue ? "overflow:hidden" : "overflow:auto"
-  );
+  document.body.setAttribute("style", isTrue ? "overflow:hidden" : "overflow:auto");
 }
 function render(dataList) {
   if (dataList.length > 0) {
@@ -290,18 +302,18 @@ function render(dataList) {
     bodyOverflow(false);
   }
 }
-var PageScroller = class {
+var Scroller = class {
   constructor() {
     this.allowList = [];
   }
-  show(id) {
+  stop(id) {
     if (this.allowList.indexOf(id) > -1) {
       return;
     }
     this.allowList.push(id);
     render(this.allowList);
   }
-  hide(id) {
+  run(id) {
     let index = this.allowList.indexOf(id);
     if (index === -1) return;
     this.allowList.splice(index, 1);
@@ -312,21 +324,92 @@ var PageScroller = class {
     render(this.allowList);
   }
 };
-var pageScroller;
-function getPageScroller() {
-  if (!pageScroller) {
-    pageScroller = new PageScroller();
+var scroller;
+function getScroller() {
+  if (!scroller) {
+    scroller = new Scroller();
   }
-  return pageScroller;
+  return scroller;
 }
-function usePageScroller() {
+function useScroll() {
   const id = Symbol();
-  const scroller = getPageScroller();
+  const myScroller = getScroller();
   return {
-    show: () => scroller.show(id),
-    hide: () => scroller.hide(id),
-    reset: () => scroller.reset()
+    stop: () => myScroller.stop(id),
+    run: () => myScroller.run(id),
+    reset: () => myScroller.reset()
   };
+}
+
+// src/Store.js
+var Store = class {
+  constructor(data) {
+    this.store = data || {};
+    this.events = /* @__PURE__ */ new Set();
+  }
+  get(key) {
+    if (!verifiedString(key)) return this.store;
+    return getObjectProperty(this.store, key);
+  }
+  set(key, value) {
+    if (!verifiedString(key)) return this;
+    setObjectProperty(this.store, key, value);
+    return this;
+  }
+  delete(key) {
+    delete getObjectProperty(this.store, key);
+    return this;
+  }
+  clear() {
+    this.store = {};
+    for (let event of this.events) {
+      delete this[event];
+    }
+    this.events.clear();
+    return this;
+  }
+  bind(name, func) {
+    if (typeof name === "string" && typeof func === "function") {
+      this.events.add(name);
+      this[name] = func.bind(this);
+      return this;
+    }
+  }
+};
+var storeMap = /* @__PURE__ */ new Map();
+function createStore(name, data, events) {
+  let store = storeMap.get(name);
+  if (store) {
+    throw new Error(`store named [${name}] is exists!`);
+  }
+  store = new Store(data);
+  storeMap.set(name, store);
+  if (events && typeof events === "object") {
+    Object.keys(events).forEach((key) => {
+      store.bind(key, events[key]);
+    });
+  }
+  return store;
+}
+function useStore(name) {
+  let store = storeMap.get(name);
+  if (!store) {
+    store = new Store();
+    storeMap.set(name, store);
+  }
+  return store;
+}
+function clearStore(name) {
+  if (name === void 0) {
+    const store = storeMap.get(name);
+    store && store.clear();
+    storeMap.delete(name);
+    return;
+  }
+  for (let [key, store] of storeMap.entries()) {
+    store.clear();
+    storeMap.delete(key);
+  }
 }
 
 // src/Page.js
@@ -404,9 +487,10 @@ var Page = class {
         }
       }
     );
-    this.pageScroller = usePageScroller();
+    this.pageScroller = useScroll();
     this.callback = new Callback();
     this.local = new LocalStore(localStoreName ? localStoreName : "app-page-store");
+    this.store = createStore(localStoreName ? localStoreName : "app-page-store");
   }
   // ref对象的配置、获取和设置
   setRefs(refs) {
@@ -541,6 +625,7 @@ var Page = class {
     this.callback.destroy();
     this.callback = null;
     this.pageScroller = null;
+    this.store = null;
   }
   binds(options) {
     for (let key in options) {
@@ -561,10 +646,25 @@ var Page = class {
     }
   }
   tips(text, type = "default", duration = 1.5) {
-    tips(text, type, duration);
+    useTips().tips(text, type, duration);
+  }
+  useStore(name) {
+    this.store = useStore(name);
+    return this.store;
+  }
+  createStore(name, events) {
+    this.store = createStore(name, events);
+    return this.store;
   }
   scroll(status) {
-    status ? this.pageScroller.show() : this.pageScroller.hide();
+    if (typeof status === "boolean") {
+      status ? this.pageScroller.run() : this.pageScroller.stop();
+      return;
+    }
+    if (typeof status === "string" && ["stop", "run"].indexOf(status) > -1) {
+      status === "stop" ? this.pageScroller.stop() : this.pageScroller.run();
+      return;
+    }
   }
 };
 
@@ -936,10 +1036,13 @@ export {
   Page,
   RangeTask,
   Tools_default as Tools,
+  clearStore,
+  createStore,
   src_default as default,
   templateToComponment,
   tips,
-  usePageScroller,
+  useScroll,
+  useStore,
   useTips,
   watchPanelEvent
 };

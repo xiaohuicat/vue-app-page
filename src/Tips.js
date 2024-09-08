@@ -1,30 +1,4 @@
-/* 提醒消息类
-show方法传入两个参数，消息内容（content）和消息样式（style）均为字符串
-style的值可取一下四种 'default'、'success'、'fail'、'warning'
-duration为消息显示时长，单位为秒，默认为1.5秒 */
-class Tips {
-  constructor() {
-    this.id = 'app-page-tips';
-    this.container;
-    this.inner;
-    this.style;
-  }
-
-  init() {
-    if (!this.container) {
-      this.container = document.createElement('div');
-      this.container.setAttribute('id', this.id + '-container');
-      document.body.appendChild(this.container);
-      this.inner = document.createElement('div');
-      this.inner.setAttribute('class', 'app-page-tips');
-      this.container.appendChild(this.inner);
-    }
-
-    if (!this.style) {
-      this.style = document.createElement('style');
-      this.style.setAttribute('type', 'text/css');
-      this.style.setAttribute(this.id + '-style', '');
-      this.style.innerHTML = `
+const STYLE = `\
 #app-page-tips-container {
   width: 100vw;
   height: 100vh;
@@ -76,7 +50,35 @@ class Tips {
 #app-page-tips-container .msg-hide {
   display: none;
 }
-`;
+`
+
+/* 提醒消息类
+show方法传入两个参数，消息内容（content）和消息样式（style）均为字符串
+style的值可取一下四种 'default'、'success'、'fail'、'warning'
+duration为消息显示时长，单位为秒，默认为1.5秒 */
+class Tips {
+  constructor() {
+    this.id = 'app-page-tips';
+    this.container;
+    this.inner;
+    this.style;
+  }
+
+  init() {
+    if (!this.container) {
+      this.container = document.createElement('div');
+      this.container.setAttribute('id', this.id + '-container');
+      document.body.appendChild(this.container);
+      this.inner = document.createElement('div');
+      this.inner.setAttribute('class', 'app-page-tips');
+      this.container.appendChild(this.inner);
+    }
+
+    if (!this.style) {
+      this.style = document.createElement('style');
+      this.style.setAttribute('type', 'text/css');
+      this.style.setAttribute(this.id + '-style', '');
+      this.style.innerHTML = STYLE;
       document.head.appendChild(this.style);
     }
   }
@@ -92,6 +94,7 @@ class Tips {
   }
 
   destory() {
+    this.id == null;
     this.inner && document.body.removeChild(this.inner);
     this.container && document.body.removeChild(this.container);
     this.style && document.head.removeChild(this.style);
@@ -99,9 +102,12 @@ class Tips {
 }
 
 let msg;
-
 function useTips() {
-  return msg ? msg : new Tips();
+  if (!msg || msg.id === null) {
+    msg = new Tips();
+  }
+
+  return msg;
 }
 
 function tips(text, type = 'default', duration = 1.5) {

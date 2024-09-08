@@ -1,8 +1,11 @@
 # 安装app-page
+
 ```shell
 npm install app-page
 ```
+
 # 初始化页面对象
+
 ```javascript
 // 创建一个页面管理对象
 import { Page } from 'app-page'
@@ -17,6 +20,7 @@ const { $ } = page;
 ```
 
 # 设置响应式数据
+
 ```javascript
 // 设置ref和computed
 page.setRefs({
@@ -26,6 +30,7 @@ page.setRefs({
 ```
 
 # 设置vue函数
+
 ```javascript
 // 设置多个vue函数
 page.setFuns({clear: () => { $.num = 0; }});
@@ -34,6 +39,7 @@ page.setFun('double', () => { $.num = $.num*2; });
 ```
 
 # 添加生命周期
+
 ```javascript
 // 一次添加多个生命周期，可以多次添加，触发时按顺序执行
 page.setLives({
@@ -45,7 +51,9 @@ page.setLive('onLoad', func);
 ```
 
 # 完整案例
-在<script setup></script>中使用
+
+在 `<script setup></script>`中使用
+
 ```javascript
 import { Page } from 'app-page';
 const page = new Page();
@@ -57,6 +65,7 @@ page.setRefs({
 });
 page.setFuns({clear: () => { $.num = 0; }});
 ```
+
 ```html
 <template>
   <div>数量：{{num}}</div>
@@ -66,39 +75,81 @@ page.setFuns({clear: () => { $.num = 0; }});
 </template>
 ```
 
-# 数据加载
-1、在page中直接使用，page.local
+# 全局数据管理
+
+1、在page中使用，默认使用的是app-page-store全局数据
+
+```javascript
+// 从默认的app-page-store读取数据
+page.store.get('useId');
+// 切换当前page对象的全局数据名称
+page.useStore('app');
+page.store.get('isLogin');
+```
+
+2、在项目初始化之前创建一个全局数据对象
+
+```javascript
+import { createStore } from 'app-page';
+const store = createStore('app', {isLogin: false, user: null}, {
+  setLogin(value){
+    this.set('isLogin', value);
+  },
+  setUser(value){
+    this.set('user', value);
+  }
+});
+store.setLogin(true);
+store.get('isLogin');
+```
+
+3、在其他页面中引入使用
+
+```javascript
+import { useStore } from 'app-page';
+const store = useStore('app');
+store.get('isLogin');
+```
+
+# 本地数据存储
+
+1、在page中直接使用，默认使用的是app-page-store本地数据
+
 ```javascript
 // 默认从本地数据app-page-store中获取
 page.local.get('version');
 // 获取本地数据page001中的name
 page.local.setName('page001').get('name');
 ```
+
 2、从app-page引入，实例化后使用。
+
 ```javascript
 import { LocalStore } from 'app-page';
 // 设置本地数据，id = 'page001'
-const store = new LocalStore('page001');
+const local = new LocalStore('page001');
 // 更换数据名称，id = 'userInfo'
-store.setName('userInfo');
+local.setName('userInfo');
 // 获取本地数据
-store.get(key);
+local.get(key);
 // 设置本地数据
-store.set(key, value);
+local.set(key, value);
 // 保存本地数据，和set功能一样
-store.save(key, value);
+local.save(key, value);
 // 删除本地数据
-store.delete(key);
+local.delete(key);
 // 清除数据
-store.clear();
+local.clear();
 // 查看数据大小
-store.size();
+local.size();
 ```
 
 # 回调使用
-1、在page中直接使用，page.callback
-2、在CallPanel中直接使用，panel.callback
-3、从app-page引入，实例化后使用。
+
+1. 在page中直接使用，page.callback
+2. 在CallPanel中直接使用，panel.callback
+3. 从app-page引入，实例化后使用
+
 ```javascript
 import { Callback } from 'app-page';
 const callback = new Callback({'input': (text) => {}});
@@ -117,8 +168,10 @@ callback.destroy();
 ```
 
 # 消息提示
-1、在page中直接使用，page.tips
-2、从app-page引入tips
+
+1. 在page中直接使用，page.tips
+2. 从app-page引入tips
+
 ```javascript
 import { tips } from 'app-page';
 /**
@@ -136,8 +189,31 @@ tips('成功信息', 'success');
 tips('失败信息', 'fail', 3);
 ```
 
+# 禁止页面滚动
+在弹窗弹出时，页面滚动被禁止，弹窗关闭时恢复。原理是在页面创建的使用调用useSrcoll生成一个唯一的id，然后在这个页面调用的时候会在列表中添加和移除这个id，最后判读列表是否为空，通过修改body的overflow属性来实现的。
+1. 直接在page中使用
+
+```javascript
+// 允许滚动
+page.scroll(true);
+page.scroll('run');
+// 禁止滚动
+page.scroll(false);
+page.scroll('stop');
+```
+2. 从app-page引入，实例化后使用
+```javascript
+import { useScroll } from 'app-page';
+const scroll = useScroll();
+// 禁止滚动
+scroll.stop();
+// 允许滚动
+scroll.run();
+```
 # 显示隐藏面板
+
 父组件创建一个面板管理对象
+
 ```javascript
 import { CallPanel } from 'app-page';
 const panel = new CallPanel();
@@ -152,6 +228,7 @@ function showPanel() {
 ```
 
 子组件监听事件
+
 ```javascript
 import { watchPanelEvent } from 'app-page';
 page.setRefs({
@@ -172,6 +249,7 @@ function hide(option, callback, config) {
   $.isShow = false;
   fatherCallback = null;
 }
+// 启用面板事件监听
 watchPanelEvent(page.props.panel, {show, hide});
 
 function confirm() {

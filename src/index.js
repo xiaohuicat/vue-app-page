@@ -5,9 +5,10 @@ import { Callback } from './Callback';
 import { templateToComponment } from './templateParse';
 import { CallPanel, watchPanelEvent } from './CallPanel';
 import { useTips, tips } from './Tips';
-import { usePageScroller } from './PageScroller';
+import { useScroll } from './Scroll';
 import { RangeTask } from './RangeTask';
 import { ElementEvents } from './ElementEvents';
+import { createStore, useStore, clearStore } from './Store';
 
 export default Page;
 export {
@@ -21,6 +22,9 @@ export {
   useTips,
   tips,
   Tools,
-  usePageScroller,
+  useScroll,
+  useStore,
+  createStore,
+  clearStore,
   templateToComponment
 };
