@@ -106,7 +106,7 @@ export class Page {
     this.pageScroller = useScroll();
     this.callback = new Callback();
     this.local = new LocalStore(localStoreName ? localStoreName : 'app-page-store');
-    this.store = createStore(localStoreName ? localStoreName : 'app-page-store');
+    this.store = useStore(localStoreName ? localStoreName : 'app-page-store');
   }
 
   // ref对象的配置、获取和设置
