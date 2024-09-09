@@ -50,7 +50,7 @@ const STYLE = `\
 #app-page-tips-container .msg-hide {
   display: none;
 }
-`
+`;
 
 /* 提醒消息类
 show方法传入两个参数，消息内容（content）和消息样式（style）均为字符串

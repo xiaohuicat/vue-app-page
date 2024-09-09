@@ -1,4 +1,4 @@
-import { verifiedString, getObjectProperty, setObjectProperty } from "./utils";
+import { verifiedString, getObjectProperty, setObjectProperty } from './utils';
 
 class Store {
   constructor(data) {
@@ -16,7 +16,7 @@ class Store {
     setObjectProperty(this.store, key, value);
     return this;
   }
-  
+
   delete(key) {
     delete getObjectProperty(this.store, key);
     return this;
@@ -31,11 +31,11 @@ class Store {
     this.events.clear();
     return this;
   }
-  
+
   bind(name, func) {
     if (typeof name === 'string' && typeof func === 'function') {
       this.events.add(name);
-      this[name] = func.bind(this);
+      this[name] = (...args) => {func.call(this, ...args)};
       return this;
     }
   }
@@ -61,7 +61,7 @@ function createStore(name, data, events) {
   store = new Store(data);
   storeMap.set(name, store);
   if (events && typeof events === 'object') {
-    Object.keys(events).forEach(key => {
+    Object.keys(events).forEach((key) => {
       store.bind(key, events[key]);
     });
   }

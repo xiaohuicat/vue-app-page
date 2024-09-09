@@ -2,20 +2,25 @@ import { Callback } from './Callback.js';
 import { ref, watch } from 'vue';
 
 export class Phone {
-  constructor(callbackDict) {
+  constructor(callbackDict = {}) {
     this.args;
     this.name;
-    this.callback = new Callback(callbackDict);
     this.timestamp = ref(Date.now());
+    if (callbackDict) {
+      this.callback = new Callback(callbackDict);
+    }
   }
-  call(name, args) {
+  call(name, ...args) {
     this.name = name;
-    this.args = args;
+    this.args = args.length === 1 ? args[0] : args;
     this.timestamp.value = Date.now();
   }
   destroy() {
-    this.callback.destroy();
-    this.callback = null;
+    if (this.callback) {
+      this.callback.destroy();
+      this.callback = null;
+    }
+
     this.args = null;
     this.timestamp.value = null;
   }
@@ -43,36 +48,32 @@ class ReplyPhone {
  * @returns {ReplyPhone} 回复电话对象
  */
 export function watchPhone(phone, callback) {
-  function run(name, replyPhone, args) {
+  function run(name, args, replyPhone) {
     if (!callback) {
       return;
     }
 
     if (callback instanceof Callback) {
-      callback.run(name, replyPhone, ...args);
+      callback.run(name, args, replyPhone);
       return;
     }
 
     if (typeof callback === 'object' && name in callback) {
-      callback[name](replyPhone, ...args);
+      callback[name](args, replyPhone);
       return;
     }
 
     if (typeof callback === 'function') {
-      callback(replyPhone, ...args);
+      callback(args, replyPhone);
     }
   }
 
   const replyPhone = new ReplyPhone(phone);
-
   watch(
     () => phone?.timestamp?.value,
-    () => {run(
-      phone?.name,
-      replyPhone,
-      phone?.args
-    )}
+    () => {
+      run(phone?.name, phone?.args, replyPhone);
+    }
   );
-
   return replyPhone;
 }

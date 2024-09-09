@@ -61,7 +61,7 @@ const { $ } = page;
 page.setRefs({
   num: 0,                             // 响应式数据ref
   price: 100,                         // 响应式数据ref
-  total: () => ($.num*$.price)+'元',  // 计算属性computed
+  total: () => ($.num * $.price)+'元',  // 计算属性computed
 });
 page.setFuns({clear: () => { $.num = 0; }});
 ```
@@ -92,11 +92,11 @@ page.store.get('isLogin');
 ```javascript
 import { createStore } from 'app-page';
 const store = createStore('app', {isLogin: false, user: null}, {
-  setLogin(value){
-    this.set('isLogin', value);
+  setLogin(self, value) {
+    self.set('isLogin', value);
   },
-  setUser(value){
-    this.set('user', value);
+  setUser(self, value) {
+    self.set('user', value);
   }
 });
 store.setLogin(true);
@@ -107,7 +107,7 @@ store.get('isLogin');
 
 ```javascript
 import { useStore } from 'app-page';
-const store = useStore('app');
+const appStore = useStore('app');
 store.get('isLogin');
 ```
 
@@ -190,7 +190,7 @@ tips('失败信息', 'fail', 3);
 ```
 
 # 禁止页面滚动
-在弹窗弹出时，页面滚动被禁止，弹窗关闭时恢复。在页面对象page创建时调用useSrcoll。原理是调用useSrcoll()生成一个唯一的id，然后通过stop和run在模块内部列表中添加和移除这个id，最后判断列表是否为空，修改body的overflow属性实现。所以新增一层弹窗，需要运行一次useScroll函数，同一层的可以共用一个scroll。
+在弹窗弹出时，页面滚动被禁止，弹窗关闭时恢复。在页面对象page创建时自动调用useSrcoll可以直接使用page.scroll('stop'|'run')。原理是调用useSrcoll()时生成一个唯一的id，然后通过stop和run在模块内部列表中添加和移除这个id，最后判断列表是否为空，修改body的overflow属性实现。所以新增一层弹窗，需要运行一次useScroll函数，同一层的可以共用一个scroll。
 1. 直接在page中使用
 
 ```javascript
@@ -212,37 +212,35 @@ scroll.run();
 ```
 
 # 父子传呼机
+### 用于父子组件之间传递数据
 
 父组件创建手机
 ```javascript
 import { Phone } from 'app-page';
 // 把允许儿子可以提的要求放进手机
 const phone = new Phone({
-  confirm: (param) => page.tips(param),
+  danger: (param) => page.tips(param),
+  finish: (param) => page.tips(param),
 });
 // 告诉儿子更新数据
 phone.call('update', {
   title: '标题',
-  content: '内容',
 });
 ```
 
 子组件监听手机
 ```javascript
 import { watchPhone } from 'app-page';
-page.setRefs({
-  title: '',
-  content: '',
-});
+page.setRefs({title: ''});
 // 父亲打电话要求更新的时候执行
-function update(option, callback, config) {
+function update(option, replyPhone) {
   $.title = option?.title;
-  $.content = option?.content;
+  replyPhone.call('finish', '已经更新好了');
 }
 // 儿子要时刻盯着手机
-const phone = watchPhone(page.props.phone, {update});
-// 告诉父亲确认
-function confirm() {
-  phone.call('confirm', '爸，有人打你儿子了');
+const replyPhone = watchPhone(page.props.phone, {update});
+// 有危险的时候告诉父亲
+function injuried() {
+  replyPhone.call('danger', '爸，有人打你儿子了');
 }
 ```

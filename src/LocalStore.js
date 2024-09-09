@@ -1,4 +1,4 @@
-import { verifiedString } from "./utils";
+import { verifiedString } from './utils';
 
 // 本地数据存储
 export class LocalStore {

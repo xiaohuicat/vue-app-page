@@ -1,32 +1,39 @@
 import { Phone } from './Phone';
+import { Callback } from './Callback';
 import { watch } from 'vue';
 
 export class CallPanel extends Phone {
   constructor(callbackDict) {
     super(callbackDict);
   }
-  show(option) {
-    this.args = option;
+  show(...args) {
+    this.name = 'show';
+    this.args = args.length === 1 ? args[0] : args;
     this.timestamp.value = Date.now();
   }
 
-  hide(option) {
-    this.args = option;
+  hide(...args) {
+    this.name = 'hide';
+    this.args = args.length === 1 ? args[0] : args;
     this.timestamp.value = Date.now();
   }
 }
 
 class ReplyPanel {
   constructor(panel) {
-    this.panel = panel instanceof CallPanel ? panel : null;
+    if (panel instanceof CallPanel) {
+      this.panel = panel;
+      this.callback = panel.callback;
+      return;
+    }
   }
 
   call(name, ...args) {
-    if (!this.panel) {
+    if (!this?.panel) {
       return false;
     }
 
-    this.panel.callback.run(name, ...args);
+    this.callback.run(name, ...args);
     return true;
   }
 }
@@ -38,33 +45,31 @@ class ReplyPanel {
  * @returns {ReplyPanel} 回复电话对象
  */
 export function watchPanel(panel, callback) {
-  function run(name, replyPanel, args) {
+  function run(name, args, replyPanel) {
     if (!callback) {
       return;
     }
 
     if (callback instanceof Callback) {
-      callback.run(name, replyPanel, ...args);
+      callback.run(name, args, replyPanel);
       return;
     }
 
     if (typeof callback === 'object' && name in callback) {
-      callback[name](replyPanel, ...args);
+      callback[name](args, replyPanel);
       return;
     }
 
     if (typeof callback === 'function') {
-      callback(replyPanel, ...args);
+      callback(args, replyPanel);
     }
   }
   const replyPanel = new ReplyPanel(panel);
   watch(
     () => panel?.timestamp?.value,
-    () => {run(
-      panel?.name,
-      replyPanel,
-      phone?.args
-    )}
+    () => {
+      run(panel?.name, panel?.args, replyPanel);
+    }
   );
   return replyPanel;
 }

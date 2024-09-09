@@ -48,7 +48,7 @@ function useScroll() {
   return {
     stop: () => myScroller.stop(id),
     run: () => myScroller.run(id),
-    reset: () => myScroller.reset(),
+    reset: () => myScroller.reset()
   };
 }
 

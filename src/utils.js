@@ -55,4 +55,17 @@ function verifiedString(string) {
   return typeof string === 'string' && string.trim() !== '';
 }
 
-export { isObject, getObjectProperty, setObjectProperty, verifiedString };
+/**
+ * 判断两个数组是否等值
+ * @param {Array} arr1 元素是基本类型
+ * @param {Array} arr2 元素是基本类型
+ * @returns
+ */
+function isEqualValueArray(arr1, arr2) {
+  const set1 = new Set(arr1);
+  const set2 = new Set(arr2);
+  const set = new Set([...set1, ...set2]);
+  return set.size === set1.size && set.size === set2.size;
+}
+
+export { isObject, getObjectProperty, setObjectProperty, verifiedString, isEqualValueArray };
