@@ -101,7 +101,12 @@ class Tips {
   }
 }
 
+// 获取一个全局的提示消息对象
 let msg;
+
+/**
+ * 获取一个全局的提示消息对象
+ */
 function useTips() {
   if (!msg || msg.id === null) {
     msg = new Tips();
@@ -110,6 +115,13 @@ function useTips() {
   return msg;
 }
 
+/**
+ * 显示一个提示消息
+ * @param {String} text 提示消息内容
+ * @param {String} type 提示消息类型，默认为default，可选值为default、success、fail、warning
+ * @param {Number} duration 提示消息显示时长，单位为秒，默认为1.5秒
+ * @returns {void}
+ */
 function tips(text, type = 'default', duration = 1.5) {
   useTips().tips(text, type, duration);
 }

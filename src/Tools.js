@@ -3,6 +3,7 @@ import { tips } from './Tips';
 /**
  * 跳转页面
  * @param {String} url 跳转的url
+ * @returns {void}
  */
 function goToUrl(url) {
   if (url == '' || url == '#' || url == undefined) {
@@ -22,6 +23,7 @@ function goToUrl(url) {
 /**
  * 复制文本
  * @param {String} text 文本内容
+ * @returns {Promise<void>}
  */
 async function copyText(text) {
   try {
@@ -44,6 +46,7 @@ async function copyText(text) {
  * @param {String} data 文件数据
  * @param {String} filename 文件名
  * @param {String} type 文件类型
+ * @returns {void}
  */
 function downloadFileByData(data, filename, type) {
   var file = new Blob([data], { type: type });
@@ -70,6 +73,7 @@ function downloadFileByData(data, filename, type) {
  * 下载文件
  * @param {String} url 文件路径
  * @param {String} filename 文件名
+ * @returns {void}
  */
 function downloadFileByUrl(url, filename) {
   var a = document.createElement('a');

@@ -1,7 +1,17 @@
+/**
+ * 滚动控制
+ * @param {Boolean} isTrue 是否禁止滚动
+ * @returns {void}
+ */
 function bodyOverflow(isTrue) {
   document.body.setAttribute('style', isTrue ? 'overflow:hidden' : 'overflow:auto');
 }
 
+/**
+ * 渲染滚动状态
+ * @param {Array} dataList 滚动列表
+ * @returns {void}
+ */
 function render(dataList) {
   if (dataList.length > 0) {
     bodyOverflow(true);
@@ -33,7 +43,12 @@ class Scroller {
   }
 }
 
+// 创建一个滚动控制实例
 let scroller;
+/**
+ * 获取滚动控制实例
+ * @returns {Scroller}
+ */
 function getScroller() {
   if (!scroller) {
     scroller = new Scroller();
@@ -42,6 +57,10 @@ function getScroller() {
   return scroller;
 }
 
+/**
+ * 获取滚动控制实例
+ * @returns {Object}
+ */
 function useScroll() {
   const id = Symbol();
   const myScroller = getScroller();

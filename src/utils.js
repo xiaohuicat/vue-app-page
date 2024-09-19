@@ -1,7 +1,19 @@
+/**
+ * 判断是否为对象
+ * @param {Any} obj
+ * @returns {Boolean}
+ */
 function isObject(obj) {
   return obj !== null && typeof obj === 'object' && !Array.isArray(obj);
 }
 
+/**
+ * 获取对象属性
+ * @param {Object} obj
+ * @param {String} key
+ * @param {Any} default_value
+ * @returns {Any}
+ */
 function getObjectProperty(obj, key, default_value) {
   const keys = key.split('.');
   let current = obj;
@@ -16,6 +28,13 @@ function getObjectProperty(obj, key, default_value) {
   return current;
 }
 
+/**
+ * 设置对象属性
+ * @param {Object} obj
+ * @param {String} key
+ * @param {Any} value
+ * @returns {Object}
+ */
 function setObjectProperty(obj, key, value) {
   const keys = key.split('.');
   let current = obj;
@@ -49,7 +68,8 @@ function setObjectProperty(obj, key, value) {
 
 /**
  * 合法字符串
- * @param {*} string
+ * @param {*} string 校验参数
+ * @returns {Boolean}
  */
 function verifiedString(string) {
   return typeof string === 'string' && string.trim() !== '';
@@ -59,7 +79,7 @@ function verifiedString(string) {
  * 判断两个数组是否等值
  * @param {Array} arr1 元素是基本类型
  * @param {Array} arr2 元素是基本类型
- * @returns
+ * @returns {Boolean}
  */
 function isEqualValueArray(arr1, arr2) {
   const set1 = new Set(arr1);
@@ -68,4 +88,28 @@ function isEqualValueArray(arr1, arr2) {
   return set.size === set1.size && set.size === set2.size;
 }
 
-export { isObject, getObjectProperty, setObjectProperty, verifiedString, isEqualValueArray };
+/**
+ * 生成一个指定长度的唯一字符串
+ * @param {Number} length
+ * @returns {String}
+ */
+function generateUniqueString(length) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // 可以自定义字符集
+  const uniqueChars = new Set();
+
+  while (uniqueChars.size < length) {
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    uniqueChars.add(chars[randomIndex]);
+  }
+
+  return Array.from(uniqueChars).join('');
+}
+
+export {
+  isObject,
+  getObjectProperty,
+  setObjectProperty,
+  verifiedString,
+  isEqualValueArray,
+  generateUniqueString
+};

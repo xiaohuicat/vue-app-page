@@ -35,7 +35,9 @@ class Store {
   bind(name, func) {
     if (typeof name === 'string' && typeof func === 'function') {
       this.events.add(name);
-      this[name] = (...args) => {func.call(this, ...args)};
+      this[name] = (...args) => {
+        func.call(this, ...args);
+      };
       return this;
     }
   }
