@@ -1,7 +1,6 @@
 import { Phone } from './Phone';
 import { Callback } from './Callback';
 import { watch } from 'vue';
-import { generateUniqueString } from './utils';
 
 export class CallPanel extends Phone {
   constructor(callbackDict) {
@@ -10,13 +9,13 @@ export class CallPanel extends Phone {
   show(...args) {
     this.name = 'show';
     this.args = args.length === 1 ? args[0] : args;
-    this.timestamp.value = `${Date.now()}-${generateUniqueString(6)}`;
+    this.timestamp.value += 1;
   }
 
   hide(...args) {
     this.name = 'hide';
     this.args = args.length === 1 ? args[0] : args;
-    this.timestamp.value = `${Date.now()}-${generateUniqueString(6)}`;
+    this.timestamp.value += 1;
   }
 }
 

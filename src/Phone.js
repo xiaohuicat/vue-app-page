@@ -1,12 +1,11 @@
 import { Callback } from './Callback.js';
-import { watch } from 'vue';
-import { generateUniqueString } from './utils.js';
+import { ref, watch } from 'vue';
 
 export class Phone {
   constructor(callbackDict = {}) {
     this.args;
     this.name;
-    this.timestamp = `${Date.now()}-${generateUniqueString(6)}`;
+    this.timestamp = ref(0);
     if (callbackDict) {
       this.callback = new Callback(callbackDict);
     }
@@ -14,7 +13,7 @@ export class Phone {
   call(name, ...args) {
     this.name = name;
     this.args = args.length === 1 ? args[0] : args;
-    this.timestamp.value = `${Date.now()}-${generateUniqueString(6)}`;
+    this.timestamp.value += 1;
   }
   destroy() {
     if (this.callback) {
@@ -23,7 +22,6 @@ export class Phone {
     }
 
     this.args = null;
-    this.timestamp.value = null;
   }
 }
 
